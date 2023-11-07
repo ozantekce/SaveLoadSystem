@@ -2,15 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ISaveable
+
+
+namespace SaveLoadSystem
 {
 
-    public void LoadSavedData(SaveableDataWrapper data);
+    public interface ISaveable
+    {
+
+        public void LoadSavedData(SaveableData data);
 
 
-    public SaveableDataWrapper CreateSaveData();
+        public SaveableData CreateSaveData();
 
 
+
+
+    }
 
 
 }
