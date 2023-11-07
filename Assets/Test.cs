@@ -12,12 +12,13 @@ public class Test : MonoBehaviour, ISaveable
 
 
     public SaveMode saveMode;
+    public string fileName = "SaveSlot1";
 
 
     [ContextMenu("Save")]
     public void Save()
     {
-        SaveLoadManager.Save(this, "SaveSlot1", saveMode);
+        SaveLoadManager.Save(this, fileName, saveMode);
     }
 
     [ContextMenu("Load")]
@@ -60,16 +61,11 @@ public class Test : MonoBehaviour, ISaveable
         }
         saveData.Write("listVector3", vectorList);
 
-        // Serialize saveData to JSON
-        string json = JsonConvert.SerializeObject(saveData);
-        
-        JsonSerializerSettings settings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { new DataWrapperConverter(), new SaveableDataConverter() },
-        };
 
-        // Deserializing from JSON back to SaveableData
-        SaveableData deserializedSaveData = JsonConvert.DeserializeObject<SaveableData>(json, settings);
+        SaveLoadManager.Save(saveData, fileName, saveMode);
+
+
+        SaveableData deserializedSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Verify that deserialized data matches original data
         Debug.Assert(saveData.Read<long>("longValue") == deserializedSaveData.Read<long>("longValue"), "Long value mismatch");
@@ -133,17 +129,10 @@ public class Test : MonoBehaviour, ISaveable
         // Adding a sub-nested SaveableData to one of the list items
         listOfSaveableData[1].Write("subNestedData", subNestedSaveData);
 
-        // Serialize the root SaveableData to JSON
-        string json = JsonConvert.SerializeObject(rootSaveData);
+        SaveLoadManager.Save(rootSaveData, fileName, saveMode);
 
-        // Assume DataWrapperConverter and SaveableDataConverter are already implemented and added to the JsonSerializerSettings
-        JsonSerializerSettings settings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { new DataWrapperConverter(), new SaveableDataConverter() },
-        };
 
-        // Deserializing from JSON back to SaveableData
-        SaveableData deserializedRootSaveData = JsonConvert.DeserializeObject<SaveableData>(json, settings);
+        SaveableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Verification: Check that the root level data matches
         Debug.Assert(rootSaveData.Read<long>("rootLong") == deserializedRootSaveData.Read<long>("rootLong"), "Root level long value mismatch");
@@ -220,16 +209,10 @@ public class Test : MonoBehaviour, ISaveable
         f1_2.Write("f2", "Hi");
 
 
-        string json = JsonConvert.SerializeObject(rootSaveData);
+        SaveLoadManager.Save(rootSaveData, fileName, saveMode);
 
-        // Assume DataWrapperConverter and SaveableDataConverter are already implemented and added to the JsonSerializerSettings
-        JsonSerializerSettings settings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { new DataWrapperConverter(), new SaveableDataConverter() },
-        };
 
-        // Deserializing from JSON back to SaveableData
-        SaveableData deserializedRootSaveData = JsonConvert.DeserializeObject<SaveableData>(json, settings);
+        SaveableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Begin testing assertions
         Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<int>("f0") == 20, "Nested int value mismatch");

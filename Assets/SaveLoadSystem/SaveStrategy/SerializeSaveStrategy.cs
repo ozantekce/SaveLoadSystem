@@ -12,17 +12,16 @@ namespace SaveLoadSystem
     {
         public string FileExtension => ".bin";
 
-        public void Save(ISaveable saveable, string path, string fileName, bool encrypt = false, string encryptionKey = null)
+        public void Save(SaveableData saveableData, string path, string fileName, bool encrypt = false, string encryptionKey = null)
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
 
-            SaveableData data = saveable.CreateSaveData();
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 IFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(memoryStream, data);
+                formatter.Serialize(memoryStream, saveableData);
 
                 byte[] serializedData = memoryStream.ToArray();
 

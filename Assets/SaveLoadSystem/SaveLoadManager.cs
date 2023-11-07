@@ -13,7 +13,7 @@ namespace SaveLoadSystem
         private static ISaveLoadStrategy SaveLoadStrategy;
 
 
-        public static void Save(ISaveable saveable, string fileName, SaveMode saveStrategy, bool encrypt = false)
+        public static void Save(SaveableData saveableData, string fileName, SaveMode saveStrategy, bool encrypt = false)
         {
             if (saveStrategy == SaveMode.Json)
             {
@@ -23,12 +23,23 @@ namespace SaveLoadSystem
             {
                 SaveLoadStrategy = new SerializeSaveStrategy();
             }
+            else if (saveStrategy == SaveMode.CustomSerialize)
+            {
+                SaveLoadStrategy = new CustomSerializeSaveStrategy();
+            }
             else
             {
                 throw new NotImplementedException();
             }
             string path = Application.persistentDataPath;
-            SaveLoadStrategy.Save(saveable, path, fileName, encrypt, EncryptionKey);
+            SaveLoadStrategy.Save(saveableData, path, fileName, encrypt, EncryptionKey);
+        }
+
+
+
+        public static void Save(ISaveable saveable, string fileName, SaveMode saveStrategy, bool encrypt = false)
+        {
+            Save(saveable.CreateSaveData(), fileName, saveStrategy, encrypt);
         }
 
 
@@ -42,6 +53,10 @@ namespace SaveLoadSystem
             else if (saveStrategy == SaveMode.Serialize)
             {
                 SaveLoadStrategy = new SerializeSaveStrategy();
+            }
+            else if (saveStrategy == SaveMode.CustomSerialize)
+            {
+                SaveLoadStrategy = new CustomSerializeSaveStrategy();
             }
             else
             {
@@ -62,7 +77,8 @@ namespace SaveLoadSystem
     public enum SaveMode
     {
         Json,
-        Serialize
+        Serialize,
+        CustomSerialize
     }
 
 

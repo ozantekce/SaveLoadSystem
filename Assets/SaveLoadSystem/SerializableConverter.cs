@@ -71,6 +71,15 @@ namespace SaveLoadSystem
         }
 
 
+        public static byte[] IntToBytes(this int value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        public static int BytesToInt(this byte[] value, int offset = 0)
+        {
+            return BitConverter.ToInt32(value, offset);
+        }
 
         public static byte[] FloatToBytes(this float value)
         {
@@ -189,6 +198,133 @@ namespace SaveLoadSystem
             long ticks = BitConverter.ToInt64(value, offset);
             return new DateTime(ticks);
         }
+
+
+        public static int BytesToInt(this byte[] value, ref int offset)
+        {
+            int result = BitConverter.ToInt32(value, offset);
+            offset += 4; // Size of int
+            return result;
+        }
+
+        public static float BytesToFloat(this byte[] value, ref int offset)
+        {
+            float result = BitConverter.ToSingle(value, offset);
+            offset += 4; // Size of float
+            return result;
+        }
+
+        public static long BytesToLong(this byte[] value, ref int offset)
+        {
+            long result = BitConverter.ToInt64(value, offset);
+            offset += 8; // Size of long
+            return result;
+        }
+
+        public static double BytesToDouble(this byte[] value, ref int offset)
+        {
+            double result = BitConverter.ToDouble(value, offset);
+            offset += 8; // Size of double
+            return result;
+        }
+
+        public static bool BytesToBool(this byte[] value, ref int offset)
+        {
+            bool result = BitConverter.ToBoolean(value, offset);
+            offset += 1; // Size of bool
+            return result;
+        }
+
+        public static Vector3 BytesToVector3(this byte[] value, ref int offset)
+        {
+            Vector3 result = new Vector3(
+                BitConverter.ToSingle(value, offset),
+                BitConverter.ToSingle(value, offset + 4),
+                BitConverter.ToSingle(value, offset + 8));
+            offset += 12; // Size of three floats
+            return result;
+        }
+
+        public static Vector2 BytesToVector2(this byte[] value, ref int offset)
+        {
+            Vector2 result = new Vector2(
+                BitConverter.ToSingle(value, offset),
+                BitConverter.ToSingle(value, offset + 4));
+            offset += 8; // Size of two floats
+            return result;
+        }
+
+        public static Color BytesToColor(this byte[] value, ref int offset)
+        {
+            Color result = new Color(
+                BitConverter.ToSingle(value, offset),
+                BitConverter.ToSingle(value, offset + 4),
+                BitConverter.ToSingle(value, offset + 8),
+                BitConverter.ToSingle(value, offset + 12));
+            offset += 16; // Size of four floats
+            return result;
+        }
+
+        public static Quaternion BytesToQuaternion(this byte[] value, ref int offset)
+        {
+            Quaternion result = new Quaternion(
+                BitConverter.ToSingle(value, offset),
+                BitConverter.ToSingle(value, offset + 4),
+                BitConverter.ToSingle(value, offset + 8),
+                BitConverter.ToSingle(value, offset + 12));
+            offset += 16; // Size of four floats
+            return result;
+        }
+
+        public static DateTime BytesToDateTime(this byte[] value, ref int offset)
+        {
+            long ticks = BitConverter.ToInt64(value, offset);
+            DateTime result = new DateTime(ticks);
+            offset += 8; // Size of long
+            return result;
+        }
+
+        public static byte[] GetVector3Bytes(this byte[] value, ref int offset)
+        {
+            byte[] result = new byte[12];
+            Array.Copy(value, offset, result, 0, 12);
+            offset += 12; // Size of three floats
+            return result;
+        }
+
+        public static byte[] GetVector2Bytes(this byte[] value, ref int offset)
+        {
+            byte[] result = new byte[8]; // Size of two floats
+            Array.Copy(value, offset, result, 0, 8);
+            offset += 8;
+            return result;
+        }
+
+        public static byte[] GetColorBytes(this byte[] value, ref int offset)
+        {
+            byte[] result = new byte[16]; // Size of four floats
+            Array.Copy(value, offset, result, 0, 16);
+            offset += 16;
+            return result;
+        }
+
+        public static byte[] GetQuaternionBytes(this byte[] value, ref int offset)
+        {
+            byte[] result = new byte[16]; // Size of four floats
+            Array.Copy(value, offset, result, 0, 16);
+            offset += 16;
+            return result;
+        }
+
+        public static byte[] GetDateTimeBytes(this byte[] value, ref int offset)
+        {
+            byte[] result = new byte[8]; // Size of long
+            Array.Copy(value, offset, result, 0, 8);
+            offset += 8;
+            return result;
+        }
+
+
     }
 
 }

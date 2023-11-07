@@ -14,12 +14,11 @@ namespace SaveLoadSystem
     {
         public string FileExtension => ".json";
 
-        public void Save(ISaveable saveable, string path, string fileName, bool encrypt = false, string encryptionKey = null)
+        public void Save(SaveableData saveabledata, string path, string fileName, bool encrypt = false, string encryptionKey = null)
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-            SaveableData data = saveable.CreateSaveData();
-            string jsonData = JsonConvert.SerializeObject(data);
+            string jsonData = JsonConvert.SerializeObject(saveabledata);
             if (encrypt)
             {
                 jsonData = encryptionKey.EncryptString(jsonData);
