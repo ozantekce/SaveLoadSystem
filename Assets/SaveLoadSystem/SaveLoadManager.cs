@@ -63,9 +63,7 @@ namespace SaveLoadSystem
                 throw new NotImplementedException();
             }
 
-            // Construct path
             string path = Application.persistentDataPath;
-            // Load data using strategy
             return SaveLoadStrategy.Load(path, fileName, encrypt, EncryptionKey);
         }
 

@@ -22,7 +22,7 @@ namespace SaveLoadSystem
             fields = new Dictionary<string, DataWrapper>();
         }
 
-        public SaveableData(Dictionary<string, DataWrapper> fieldToData)
+        internal SaveableData(Dictionary<string, DataWrapper> fieldToData)
         {
             fields = fieldToData;
         }
@@ -32,7 +32,7 @@ namespace SaveLoadSystem
         {
             if (fields.ContainsKey(field))
             {
-                throw new Exception("Field using");
+                throw new ArgumentException($"A field with the name '{field}' already exists. Duplicate fields are not allowed.");
             }
             fields[field] = DataWrapper.Create(value);
 

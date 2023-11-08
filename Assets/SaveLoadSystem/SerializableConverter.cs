@@ -6,7 +6,7 @@ using static SaveLoadSystem.DataWrapper;
 
 namespace SaveLoadSystem
 {
-    public static class SerializableConverter
+    internal static class SerializableConverter
     {
 
 

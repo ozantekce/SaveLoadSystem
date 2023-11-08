@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SaveLoadSystem
 {
-    public interface ISaveLoadStrategy
+    internal interface ISaveLoadStrategy
     {
 
         public string FileExtension { get; }

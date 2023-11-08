@@ -57,7 +57,7 @@ namespace SaveLoadSystem
     }
 
 
-    public class DataWrapperConverter : JsonConverter
+    internal class DataWrapperConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -119,7 +119,7 @@ namespace SaveLoadSystem
     }
 
 
-    public class SaveableDataConverter : JsonConverter
+    internal class SaveableDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {

@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace SaveLoadSystem
 {
 
-    public class SerializeSaveStrategy : ISaveLoadStrategy
+    internal class SerializeSaveStrategy : ISaveLoadStrategy
     {
         public string FileExtension => ".bin";
 
@@ -40,6 +40,12 @@ namespace SaveLoadSystem
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
             string serializedString = File.ReadAllText(path);
+
+            if (!File.Exists(path))
+            {
+                UnityEngine.Debug.LogError("Save file not found at " + path);
+                return null;
+            }
 
             byte[] serializedData = Convert.FromBase64String(serializedString);
 

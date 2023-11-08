@@ -5,7 +5,7 @@ using static SaveLoadSystem.DataWrapper;
 
 namespace SaveLoadSystem
 {
-    public class CustomSerializeSaveStrategy : ISaveLoadStrategy
+    internal class CustomSerializeSaveStrategy : ISaveLoadStrategy
     {
         public string FileExtension => ".cus";
 
@@ -29,6 +29,12 @@ namespace SaveLoadSystem
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
 
+            if (!File.Exists(path))
+            {
+                UnityEngine.Debug.LogError("Save file not found at " + path);
+                return null;
+            }
+
             byte[] serializedData = File.ReadAllBytes(path);
 
             if (decrypt)
@@ -41,7 +47,7 @@ namespace SaveLoadSystem
 
 
 
-        public static void Serialize(SaveableData saveableData, List<byte> serializedData)
+        private static void Serialize(SaveableData saveableData, List<byte> serializedData)
         {
 
             Dictionary<string, DataWrapper> fields = saveableData.Fields;
@@ -235,7 +241,7 @@ namespace SaveLoadSystem
             }
         }
 
-        public static SaveableData Deserialize(byte[] data, ref int offset)
+        private static SaveableData Deserialize(byte[] data, ref int offset)
         {
             SaveableData saveableData = new SaveableData();
 
