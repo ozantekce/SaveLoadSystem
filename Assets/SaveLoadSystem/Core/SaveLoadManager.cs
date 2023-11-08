@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
     public static class SaveLoadManager
     {
@@ -37,13 +37,13 @@ namespace SaveLoadSystem
 
 
 
-        public static void Save(ISaveable saveable, string fileName, SaveMode saveStrategy, bool encrypt = false)
+        public static void Save(ISaveable saveable, string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, bool encrypt = false)
         {
             Save(saveable.CreateSaveData(), fileName, saveStrategy, encrypt);
         }
 
 
-        public static SaveableData Load(string fileName, SaveMode saveStrategy, bool encrypt = false)
+        public static SaveableData Load(string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, bool encrypt = false)
         {
             // Select strategy
             if (saveStrategy == SaveMode.Json)
@@ -72,12 +72,7 @@ namespace SaveLoadSystem
 
     }
 
-    public enum SaveMode
-    {
-        Json,
-        Serialize,
-        CustomSerialize
-    }
+
 
 
 }

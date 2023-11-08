@@ -5,7 +5,7 @@ using System.Text;
 
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
     internal interface ISaveLoadStrategy
     {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using UnityEngine;
-using static SaveLoadSystem.DataWrapper;
+using SaveLoadSystem.Core;
 
 public static class RandomValueGenerator
 {
@@ -12,12 +12,6 @@ public static class RandomValueGenerator
     private const int YearRange = 200;
 
 
-    /*
-    public static T CreateRandom<T>(DataType type)
-    {
-        object randomValue = CreateRandom(type);
-        return (T)randomValue;
-    }*/
 
     public static object CreateRandom(DataType type)
     {

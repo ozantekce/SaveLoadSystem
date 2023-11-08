@@ -1,59 +1,15 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static SaveLoadSystem.DataWrapper;
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
     [JsonObject]
     [System.Serializable]
     public class DataWrapper
     {
-
-        public enum DataType
-        {
-            // Basic Types
-            Int,
-            Float,
-            Long,
-            Double,
-            Bool,
-            String,
-            //
-
-            // Others
-            Vector3,
-            Vector2,
-            Color,
-            Quaternion,
-            DateTime,
-
-            SaveableData,
-            //
-
-            // List
-            List_Int,
-            List_Float,
-            List_Long,
-            List_Double,
-            List_Bool,
-            List_String,
-
-            List_Vector3,
-            List_Vector2,
-            List_Color,
-            List_Quaternion,
-            List_DateTime,
-
-            List_SaveableData,
-            //
-
-        }
-
 
         [JsonProperty] private DataType t;
         [JsonProperty] private object v;
@@ -133,6 +89,54 @@ namespace SaveLoadSystem
             }
 
             return (T)v;
+        }
+
+
+        public object GetValue()
+        {
+            if (t == DataType.Vector3)
+            {
+                return SerializableConverter.ConvertToObject<Vector3>((byte[])v);
+            }
+            else if (t == DataType.Vector2)
+            {
+                return SerializableConverter.ConvertToObject<Vector2>((byte[])v);
+            }
+            else if (t == DataType.Color)
+            {
+                return SerializableConverter.ConvertToObject<Color>((byte[])v);
+            }
+            else if (t == DataType.Quaternion)
+            {
+                return SerializableConverter.ConvertToObject<Quaternion>((byte[])v);
+            }
+            else if (t == DataType.DateTime)
+            {
+                return SerializableConverter.ConvertToObject<DateTime>((byte[])v);
+            }
+            else if (t == DataType.List_Vector3)
+            {
+                return SerializableConverter.ConvertToObjectList<Vector3>((List<byte[]>)v);
+            }
+            else if (t == DataType.List_Vector2)
+            {
+                return SerializableConverter.ConvertToObjectList<Vector2>((List<byte[]>)v);
+            }
+            else if (t == DataType.List_Color)
+            {
+                return SerializableConverter.ConvertToObjectList<Color>((List<byte[]>)v);
+            }
+            else if (t == DataType.List_Quaternion)
+            {
+                return SerializableConverter.ConvertToObjectList<Quaternion>((List<byte[]>)v);
+            }
+            else if (t == DataType.List_DateTime)
+            {
+                return SerializableConverter.ConvertToObjectList<DateTime>((List<byte[]>)v);
+            }
+
+            return v;
+
         }
 
 

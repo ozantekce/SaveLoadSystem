@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
 
     [JsonObject]
@@ -44,6 +44,11 @@ namespace SaveLoadSystem
             return fields[field].GetValue<T>();
         }
 
+        public object Read(string field)
+        {
+            return fields[field].GetValue();
+        }
+
 
         public bool TryRead<T>(string field, out T data)
         {
@@ -56,6 +61,21 @@ namespace SaveLoadSystem
             else
             {
                 data = default;
+                return false;
+            }
+        }
+
+
+        public bool TryRead(string fieldName, out object loadedValue)
+        {
+            if (fields.TryGetValue(fieldName, out DataWrapper dataWrapper))
+            {
+                loadedValue = Read(fieldName);
+                return true;
+            }
+            else
+            {
+                loadedValue = null;
                 return false;
             }
         }

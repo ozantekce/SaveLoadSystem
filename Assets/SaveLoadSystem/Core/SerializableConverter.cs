@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static SaveLoadSystem.DataWrapper;
+using static SaveLoadSystem.Core.DataWrapper;
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
     internal static class SerializableConverter
     {

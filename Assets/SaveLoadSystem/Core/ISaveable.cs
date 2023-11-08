@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
 
     public interface ISaveable

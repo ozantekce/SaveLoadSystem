@@ -5,7 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
 
     internal class SerializeSaveStrategy : ISaveLoadStrategy

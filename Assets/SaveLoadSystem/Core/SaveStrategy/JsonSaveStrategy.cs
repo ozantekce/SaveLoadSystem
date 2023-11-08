@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using UnityEngine;
-using static SaveLoadSystem.DataWrapper;
+using static SaveLoadSystem.Core.DataWrapper;
 using System.Linq;
 
-namespace SaveLoadSystem
+
+namespace SaveLoadSystem.Core
 {
 
     public class JsonSaveStrategy : ISaveLoadStrategy

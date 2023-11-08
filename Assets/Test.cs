@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using SaveLoadSystem;
+using SaveLoadSystem.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +8,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using static SaveLoadSystem.DataWrapper;
+using static SaveLoadSystem.Core.DataWrapper;
 using Debug = UnityEngine.Debug;
 
-public class Test : MonoBehaviour, ISaveable
+public class Test : MonoBehaviour
 {
 
 
@@ -22,14 +23,44 @@ public class Test : MonoBehaviour, ISaveable
     [ContextMenu("Save")]
     public void Save()
     {
-        SaveLoadManager.Save(this, fileName, saveMode);
+
+        SaveableData saveData = new SaveableData();
+
+        saveData.Write("longValue", 9999999L);
+        saveData.Write("doubleValue", 9999999.88D);
+        saveData.Write("color", new Color(0, 50, 0));
+        saveData.Write("q", transform.rotation);
+        saveData.Write("dateTime", System.DateTime.Now);
+
+        saveData.Write("vector2", new Vector2(10, 20));
+
+        List<int> array = new List<int>();
+        for (int i = 0; i < 20; i++)
+        {
+            array.Add(i);
+        }
+
+        saveData.Write("list", array);
+        SaveLoadManager.Save(saveData, fileName, saveMode);
     }
 
     [ContextMenu("Load")]
     public void Load()
     {
         SaveableData loadedData = SaveLoadManager.Load("SaveSlot1", saveMode);
-        LoadSavedData(loadedData);
+        Debug.Log(loadedData.Read<long>("longValue"));
+        Debug.Log(loadedData.Read<double>("doubleValue"));
+        Debug.Log(loadedData.Read<Color>("color"));
+        Debug.Log(loadedData.Read<Vector2>("vector2"));
+        Debug.Log(loadedData.Read<Quaternion>("q"));
+        Debug.Log(loadedData.Read<DateTime>("dateTime"));
+
+        List<int> array = loadedData.Read<List<int>>("list");
+
+        foreach (var item in array)
+        {
+            Debug.Log("array : " + item);
+        }
     }
 
 
@@ -534,48 +565,6 @@ public class Test : MonoBehaviour, ISaveable
     }
 
 
-    public void LoadSavedData(SaveableData data)
-    {
-
-        Debug.Log(data.Read<long>("longValue"));
-        Debug.Log(data.Read<double>("doubleValue"));
-        Debug.Log(data.Read<Color>("color"));
-        Debug.Log(data.Read<Vector2>("vector2"));
-        Debug.Log(data.Read<Quaternion>("q"));
-        Debug.Log(data.Read<DateTime>("dateTime"));
-
-        List<int> array = data.Read<List<int>>("list");
-
-        foreach (var item in array)
-        {
-            Debug.Log("array : " + item);
-        }
-
-    }
-
-    public SaveableData CreateSaveData()
-    {
-
-        SaveableData saveData = new SaveableData();
-
-        saveData.Write("longValue", 9999999L);
-        saveData.Write("doubleValue", 9999999.88D);
-        saveData.Write("color", new Color(0, 50, 0));
-        saveData.Write("q", transform.rotation);
-        saveData.Write("dateTime", System.DateTime.Now);
-
-        saveData.Write("vector2", new Vector2(10, 20));
-
-        List<int> array = new List<int>();
-        for (int i = 0; i < 20; i++)
-        {
-            array.Add(i);
-        }
-
-        saveData.Write("list", array);
-
-        return saveData;
-    }
 
 
 

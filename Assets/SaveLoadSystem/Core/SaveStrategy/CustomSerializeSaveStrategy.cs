@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static SaveLoadSystem.DataWrapper;
+using static SaveLoadSystem.Core.DataWrapper;
 
-namespace SaveLoadSystem
+namespace SaveLoadSystem.Core
 {
     internal class CustomSerializeSaveStrategy : ISaveLoadStrategy
     {
