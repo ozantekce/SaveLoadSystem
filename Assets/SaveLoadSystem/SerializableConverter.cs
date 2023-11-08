@@ -2,12 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+using static SaveLoadSystem.DataWrapper;
 
 namespace SaveLoadSystem
 {
     public static class SerializableConverter
     {
+
+
+        public static readonly Dictionary<DataType, byte> DataTypeToByteDict = new Dictionary<DataType, byte>
+        {
+            { DataType.Int, (byte)DataType.Int },
+            { DataType.Float, (byte)DataType.Float },
+            { DataType.Long, (byte)DataType.Long },
+            { DataType.Double, (byte)DataType.Double },
+            { DataType.Bool, (byte)DataType.Bool },
+            { DataType.String, (byte)DataType.String },
+            { DataType.Vector3, (byte)DataType.Vector3 },
+            { DataType.Vector2, (byte)DataType.Vector2 },
+            { DataType.Color, (byte)DataType.Color },
+            { DataType.Quaternion, (byte)DataType.Quaternion },
+            { DataType.DateTime, (byte)DataType.DateTime },
+            { DataType.SaveableData, (byte)DataType.SaveableData },
+            { DataType.List_Int, (byte)DataType.List_Int },
+            { DataType.List_Float, (byte)DataType.List_Float },
+            { DataType.List_Long, (byte)DataType.List_Long },
+            { DataType.List_Double, (byte)DataType.List_Double },
+            { DataType.List_Bool, (byte)DataType.List_Bool },
+            { DataType.List_String, (byte)DataType.List_String },
+            { DataType.List_Vector3, (byte)DataType.List_Vector3 },
+            { DataType.List_Vector2, (byte)DataType.List_Vector2 },
+            { DataType.List_Color, (byte)DataType.List_Color },
+            { DataType.List_Quaternion, (byte)DataType.List_Quaternion },
+            { DataType.List_DateTime, (byte)DataType.List_DateTime },
+            { DataType.List_SaveableData, (byte)DataType.List_SaveableData },
+        };
 
 
         private static readonly Dictionary<Type, Func<object, byte[]>> SerializableConversionStrategies = new Dictionary<Type, Func<object, byte[]>>
@@ -27,6 +56,13 @@ namespace SaveLoadSystem
             { typeof(Quaternion),data  => BytesToQuaternion(data) },
             { typeof(DateTime),data => BytesToDateTime(data) },
         };
+
+
+
+        private static bool UseCache = true;
+
+        private static byte[] IntBytes = new byte[4];
+        private static byte[] LongBytes = new byte[8];
 
 
         public static byte[] ConvertToBytes<T>(this T data)
@@ -73,7 +109,26 @@ namespace SaveLoadSystem
 
         public static byte[] IntToBytes(this int value)
         {
-            return BitConverter.GetBytes(value);
+            if(!UseCache) return BitConverter.GetBytes(value);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                // Little-endian: least significant byte first
+                IntBytes[0] = (byte)value;
+                IntBytes[1] = (byte)(value >> 8);
+                IntBytes[2] = (byte)(value >> 16);
+                IntBytes[3] = (byte)(value >> 24);
+            }
+            else
+            {
+                // Big-endian: most significant byte first
+                IntBytes[0] = (byte)(value >> 24);
+                IntBytes[1] = (byte)(value >> 16);
+                IntBytes[2] = (byte)(value >> 8);
+                IntBytes[3] = (byte)value;
+            }
+
+            return IntBytes;
         }
 
         public static int BytesToInt(this byte[] value, int offset = 0)
@@ -83,7 +138,10 @@ namespace SaveLoadSystem
 
         public static byte[] FloatToBytes(this float value)
         {
-            return BitConverter.GetBytes(value);
+            if(!UseCache) return BitConverter.GetBytes(value);
+
+            int intValue = BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
+            return intValue.IntToBytes();
         }
 
         public static float BytesToFloat(this byte[] value, int offset = 0)
@@ -93,7 +151,25 @@ namespace SaveLoadSystem
 
         public static byte[] LongToBytes(this long value)
         {
-            return BitConverter.GetBytes(value);
+            if(!UseCache) return BitConverter.GetBytes(value);
+
+
+            if (BitConverter.IsLittleEndian)
+            {
+                for (int i = 0; i < LongBytes.Length; i++)
+                {
+                    LongBytes[i] = (byte)(value >> (8 * i));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < LongBytes.Length; i++)
+                {
+                    LongBytes[7 - i] = (byte)(value >> (8 * i));
+                }
+            }
+
+            return LongBytes;
         }
 
         public static long BytesToLong(this byte[] value, int offset = 0)
@@ -103,7 +179,12 @@ namespace SaveLoadSystem
 
         public static byte[] DoubleToBytes(this double value)
         {
-            return BitConverter.GetBytes(value);
+            if(!UseCache) return BitConverter.GetBytes(value);
+
+            // Convert double to long representation
+            long longValue = BitConverter.DoubleToInt64Bits(value);
+            return longValue.LongToBytes(); // Reuse the LongToBytes method
+
         }
 
         public static double BytesToDouble(this byte[] value, int offset = 0)
@@ -323,6 +404,14 @@ namespace SaveLoadSystem
             offset += 8;
             return result;
         }
+
+
+
+        public static byte DataTypeToByte(this DataType dataType)
+        {
+            return DataTypeToByteDict[dataType];
+        }
+
 
 
     }

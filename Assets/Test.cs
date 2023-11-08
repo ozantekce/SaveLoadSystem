@@ -346,7 +346,7 @@ public class Test : MonoBehaviour, ISaveable
             { DataType.Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.SaveableData, new ProbabilityMinMaxCreateCount(0.1f, 1, 2) },
+            { DataType.SaveableData, new ProbabilityMinMaxCreateCount(0.3f, 1, 2) },
             { DataType.List_Int, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.List_Float, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.List_Long, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
@@ -438,7 +438,7 @@ public class Test : MonoBehaviour, ISaveable
 
     public bool IsSame(SaveableData s0, SaveableData s1)
     {
-        return true;
+
         if (s0.Fields.Count != s1.Fields.Count)
         {
             Debug.LogError("Here");

@@ -58,14 +58,32 @@ namespace SaveLoadSystem
         [JsonProperty] private DataType t;
         [JsonProperty] private object v;
 
+        [JsonIgnore] private byte[] bytes;
+        [JsonIgnore] private List<byte[]> bytesList;
+
+
         [JsonIgnore] public DataType Type { get => t; set => t = value; }
         [JsonIgnore] public object Value { get => v; set => v = value; }
-
-
+        [JsonIgnore] public byte[] Bytes { get => bytes; set => bytes = value; }
+        [JsonIgnore] public List<byte[]> BytesList { get => bytesList; set => bytesList = value; }
 
         public DataWrapper(object data, DataType dataType)
         {
             v = data;
+            t = dataType;
+        }
+
+        public DataWrapper(byte[] data, DataType dataType)
+        {
+            v = data;
+            Bytes = data;
+            t = dataType;
+        }
+
+        public DataWrapper(List<byte[]> data, DataType dataType)
+        {
+            v = data;
+            BytesList = data;
             t = dataType;
         }
 

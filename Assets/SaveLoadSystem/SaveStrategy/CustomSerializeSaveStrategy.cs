@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static SaveLoadSystem.DataWrapper;
+using static UnityEditor.Progress;
 
 namespace SaveLoadSystem
 {
@@ -16,9 +18,10 @@ namespace SaveLoadSystem
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-
-            byte[] serializedData = Serialize(saveableData);
-
+            
+            List<byte> serializedList = new List<byte>();
+            Serialize(saveableData, serializedList);
+            byte[] serializedData = serializedList.ToArray();
             if (encrypt)
             {
                 serializedData = encryptionKey.EncryptBytes(serializedData);
@@ -42,157 +45,258 @@ namespace SaveLoadSystem
         }
 
 
-
-        public static byte[] Serialize(SaveableData saveableData)
+        public struct FieldNameChildPair
         {
-            List<byte> serializedData = new List<byte>();
+            public string name;
+            public DataWrapper child;
+
+            public FieldNameChildPair(string name, DataWrapper child)
+            {
+                this.name = name;
+                this.child = child;
+            }
+        }
+
+        public struct FieldNameChildsListPair
+        {
+            public string name;
+            public DataWrapper childsList;
+
+            public FieldNameChildsListPair(string name, DataWrapper childsList)
+            {
+                this.name = name;
+                this.childsList = childsList;
+            }
+        }
+
+
+        public static void Serialize(SaveableData saveableData, List<byte> serializedData)
+        {
+            //List<byte> serializedData = new List<byte>();
             Dictionary<string, DataWrapper> fields = saveableData.Fields;
 
             serializedData.AddRange(BitConverter.GetBytes(fields.Count));
 
+
+
             foreach (var item in fields)
             {
+                /*
+                if(item.Value.Type == DataType.SaveableData)
+                {
+                    childs.Enqueue(new FieldNameChildPair(item.Key, item.Value));
+                    continue;
+                }
+                else if (item.Value.Type == DataType.List_SaveableData)
+                {
+                    childsLists.Enqueue(new FieldNameChildsListPair(item.Key, item.Value));
+                    continue;
+                }
+                */
+
                 byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(item.Key);
-                serializedData.AddRange(BitConverter.GetBytes(fieldNameBytes.Length));
+
+                serializedData.AddRange(fieldNameBytes.Length.IntToBytes());
                 serializedData.AddRange(fieldNameBytes);
 
-                serializedData.AddRange(ConvertToByte(item.Value));
+                ConvertToByteAndAdd(item.Value, serializedData);
+
+
             }
 
-            return serializedData.ToArray();
+            /*
+            while(childs.Count > 0)
+            {
+                FieldNameChildPair current = childs.Dequeue();
+                string fieldName = current.name;
+                DataWrapper sd = current.child;
+
+                byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(fieldName);
+                serializedData.AddRange(BitConverter.GetBytes(fieldNameBytes.Length));
+                serializedData.AddRange(fieldNameBytes);
+                ConvertToByteAndAdd(sd, serializedData, ref offset);
+            }
+
+            while (childsLists.Count > 0)
+            {
+                FieldNameChildsListPair current = childsLists.Dequeue();
+                string fieldName = current.name;
+                DataWrapper sd = current.childsList;
+
+                byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(fieldName);
+                serializedData.AddRange(BitConverter.GetBytes(fieldNameBytes.Length));
+                serializedData.AddRange(fieldNameBytes);
+                ConvertToByteAndAdd(sd, serializedData, ref offset);
+            }
+            */
+
+            return;
         }
 
-        private static byte[] ConvertToByte(DataWrapper data)
+        private static void ConvertToByteAndAdd(DataWrapper data, List<byte> refSerializedData)
         {
-
             switch (data.Type)
             {
                 case DataType.Int:
-                    return new byte[] { (byte)DataType.Int }.Concat(data.GetValue<int>().IntToBytes()).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.GetValue<int>().IntToBytes());
+                    return;
                 case DataType.String:
-                    return new byte[] { (byte)DataType.String }.Concat(BitConverter.GetBytes(data.GetValue<string>().Length)).Concat(System.Text.Encoding.UTF8.GetBytes(data.GetValue<string>())).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.GetValue<string>().Length.IntToBytes());
+                    refSerializedData.AddRange(System.Text.Encoding.UTF8.GetBytes(data.GetValue<string>()));
+                    return;
                 case DataType.Float:
-                    return new byte[] { (byte)DataType.Float }.Concat(data.GetValue<float>().FloatToBytes()).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.GetValue<float>().FloatToBytes());
+                    return;
                 case DataType.Long:
-                    return new byte[] { (byte)DataType.Long }.Concat(data.GetValue<long>().LongToBytes()).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.GetValue<long>().LongToBytes());
+                    return;
                 case DataType.Double:
-                    return new byte[] { (byte)DataType.Double }.Concat(data.GetValue<double>().DoubleToBytes()).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.GetValue<double>().DoubleToBytes());
+
+                    return;
                 case DataType.Bool:
-                    return new byte[] { (byte)DataType.Bool, Convert.ToByte(data.GetValue<bool>()) };
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.Add(Convert.ToByte(data.GetValue<bool>()));
+                    return;
                 case DataType.Vector3:
-                    return new byte[] { (byte)DataType.Vector3 }.Concat((byte[])data.Value).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.Bytes);
+                    return;
                 case DataType.Vector2:
-                    return new byte[] { (byte)DataType.Vector2 }.Concat((byte[])data.Value).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.Bytes);
+
+                    return;
                 case DataType.Color:
-                    return new byte[] { (byte)DataType.Color }.Concat((byte[])data.Value).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.Bytes);
+                    return;
                 case DataType.Quaternion:
-                    return new byte[] { (byte)DataType.Quaternion }.Concat((byte[])data.Value).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.Bytes);
+                    return;
                 case DataType.DateTime:
-                    return new byte[] { (byte)DataType.DateTime }.Concat((byte[])data.Value).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(data.Bytes);
+                    return;
                 case DataType.SaveableData:
-                    byte[] serializedData = Serialize(data.GetValue<SaveableData>());
-                    return new byte[] { (byte)DataType.SaveableData }.Concat(BitConverter.GetBytes(serializedData.Length)).Concat(serializedData).ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    int currentOffset = refSerializedData.Count;
+                    Serialize(data.GetValue<SaveableData>(), refSerializedData);
+                    int added = refSerializedData.Count - currentOffset;
+                    refSerializedData.InsertRange(currentOffset, added.IntToBytes());
+                    return;
                 case DataType.List_Int:
                     List<int> intList = data.GetValue<List<int>>();
-                    var intBytes = new List<byte> { (byte)DataType.List_Int };
-                    intBytes.AddRange(intList.Count.IntToBytes());
-                    intList.ForEach(i => intBytes.AddRange(i.IntToBytes()));
-                    return intBytes.ToArray();
-
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(intList.Count.IntToBytes());
+                    intList.ForEach(i => refSerializedData.AddRange(i.IntToBytes()));
+                    return;
                 case DataType.List_Float:
                     List<float> floatList = data.GetValue<List<float>>();
-                    var floatBytes = new List<byte> { (byte)DataType.List_Float };
-                    floatBytes.AddRange(floatList.Count.IntToBytes());
-                    floatList.ForEach(f => floatBytes.AddRange(f.FloatToBytes()));
-                    return floatBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(floatList.Count.IntToBytes());
+                    floatList.ForEach(f => refSerializedData.AddRange(f.FloatToBytes()));
+                    return;
 
                 case DataType.List_String:
                     List<string> stringList = data.GetValue<List<string>>();
-                    var stringBytes = new List<byte> { (byte)DataType.List_String };
-                    stringBytes.AddRange(stringList.Count.IntToBytes());
-                    stringList.ForEach(s => {
-                        var strBytes = System.Text.Encoding.UTF8.GetBytes(s);
-                        stringBytes.AddRange(s.Length.IntToBytes());
-                        stringBytes.AddRange(strBytes);
-                    });
-                    return stringBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(stringList.Count.IntToBytes());
+
+                    for (int i = 0; i < stringList.Count; i++)
+                    {
+                        var strBytes = System.Text.Encoding.UTF8.GetBytes(stringList[i]);
+                        refSerializedData.AddRange(stringList[i].Length.IntToBytes());
+                        refSerializedData.AddRange(strBytes);
+
+                    }
+
+                    return;
 
                 case DataType.List_Long:
                     List<long> longList = data.GetValue<List<long>>();
-                    var longBytes = new List<byte> { (byte)DataType.List_Long };
-                    longBytes.AddRange(longList.Count.IntToBytes());
-                    longList.ForEach(l => longBytes.AddRange(l.LongToBytes()));
-                    return longBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(longList.Count.IntToBytes());
+                    longList.ForEach(l => refSerializedData.AddRange(l.LongToBytes()));
+                    return;
 
                 case DataType.List_Double:
                     List<double> doubleList = data.GetValue<List<double>>();
-                    var doubleBytes = new List<byte> { (byte)DataType.List_Double };
-                    doubleBytes.AddRange(doubleList.Count.IntToBytes());
-                    doubleList.ForEach(d => doubleBytes.AddRange(d.DoubleToBytes()));
-                    return doubleBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(doubleList.Count.IntToBytes());
+                    doubleList.ForEach(d => refSerializedData.AddRange(d.DoubleToBytes()));
+                    return;
 
                 case DataType.List_Bool:
                     List<bool> boolList = data.GetValue<List<bool>>();
-                    var boolBytes = new List<byte> { (byte)DataType.List_Bool };
-                    boolBytes.AddRange(boolList.Count.IntToBytes());
-                    boolList.ForEach(b => boolBytes.Add(Convert.ToByte(b)));
-                    return boolBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(boolList.Count.IntToBytes());
+                    boolList.ForEach(b => refSerializedData.Add(Convert.ToByte(b)));
+                    return;
 
                 case DataType.List_Vector3:
-                    List<Vector3> vector3List = data.GetValue<List<Vector3>>();
-                    var vector3Bytes = new List<byte> { (byte)DataType.List_Vector3 };
-                    vector3Bytes.AddRange(vector3List.Count.IntToBytes());
+                    List<byte[]> vector3List = data.BytesList;
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(vector3List.Count.IntToBytes());
                     vector3List.ForEach(v => {
-                        vector3Bytes.AddRange(v.Vector3ToBytes());
+                        refSerializedData.AddRange(v);
                     });
-                    return vector3Bytes.ToArray();
+                    return;
 
                 case DataType.List_Vector2:
-                    List<Vector2> vector2List = data.GetValue<List<Vector2>>();
-                    var vector2Bytes = new List<byte> { (byte)DataType.List_Vector2 };
-                    vector2Bytes.AddRange(vector2List.Count.IntToBytes());
+                    List<byte[]> vector2List = data.BytesList;
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(vector2List.Count.IntToBytes());
                     vector2List.ForEach(v => {
-                        vector2Bytes.AddRange(v.Vector2ToBytes());
+                        refSerializedData.AddRange(v);
                     });
-                    return vector2Bytes.ToArray();
+                    return;
 
                 case DataType.List_Color:
-                    List<Color> colorList = data.GetValue<List<Color>>();
-                    var colorBytes = new List<byte> { (byte)DataType.List_Color };
-                    colorBytes.AddRange(colorList.Count.IntToBytes());
+                    List<byte[]> colorList = data.BytesList;
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(colorList.Count.IntToBytes());
                     colorList.ForEach(c => {
-                        colorBytes.AddRange(c.ColorToBytes());
+                        refSerializedData.AddRange(c);
                     });
-                    return colorBytes.ToArray();
+                    return;
 
                 case DataType.List_Quaternion:
-                    List<Quaternion> quaternionList = data.GetValue<List<Quaternion>>();
-                    var quaternionBytes = new List<byte> { (byte)DataType.List_Quaternion };
-                    quaternionBytes.AddRange(quaternionList.Count.IntToBytes());
+                    List<byte[]> quaternionList = data.BytesList;
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(quaternionList.Count.IntToBytes());
                     quaternionList.ForEach(q => {
-                        quaternionBytes.AddRange(q.QuaternionToBytes());
+                        refSerializedData.AddRange(q);
                     });
-                    return quaternionBytes.ToArray();
+                    return;
 
                 case DataType.List_DateTime:
-                    List<DateTime> dateTimeList = data.GetValue<List<DateTime>>();
-                    var dateTimeBytes = new List<byte> { (byte)DataType.List_DateTime };
-                    dateTimeBytes.AddRange(dateTimeList.Count.IntToBytes());
+                    List<byte[]> dateTimeList = data.BytesList;
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(dateTimeList.Count.IntToBytes());
                     dateTimeList.ForEach(dt => {
-                        dateTimeBytes.AddRange(dt.DateTimeToBytes());
+                        refSerializedData.AddRange(dt);
                     });
-                    return dateTimeBytes.ToArray();
+                    return;
 
                 case DataType.List_SaveableData:
                     List<SaveableData> saveableDataList = data.GetValue<List<SaveableData>>();
-                    var saveableDataBytes = new List<byte> { (byte)DataType.List_SaveableData };
-                    saveableDataBytes.AddRange(saveableDataList.Count.IntToBytes());
-                    saveableDataList.ForEach(sd => {
-                        byte[] serializedData = Serialize(sd);
-                        saveableDataBytes.AddRange(serializedData.Length.IntToBytes());
-                        saveableDataBytes.AddRange(serializedData);
-                    });
-                    return saveableDataBytes.ToArray();
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    refSerializedData.AddRange(saveableDataList.Count.IntToBytes());
+                    for (int i = 0; i < saveableDataList.Count; i++)
+                    {
+                        currentOffset = refSerializedData.Count;
+                        Serialize(saveableDataList[i], refSerializedData);
+                        added = refSerializedData.Count - currentOffset;
+                        refSerializedData.InsertRange(currentOffset, added.IntToBytes());
+                    }
+                    return;
 
                 default:
                     throw new InvalidOperationException("Unsupported data type." + data+" "+data.GetType());
@@ -370,7 +474,6 @@ namespace SaveLoadSystem
         {
             switch (dataType)
             {
-    
                 case DataType.List_Vector3:
                     return data.GetVector3Bytes(ref offset);
                 case DataType.List_Vector2:
@@ -385,6 +488,8 @@ namespace SaveLoadSystem
                     throw new InvalidOperationException($"Unsupported data type: {dataType}");
             }
         }
+
+
 
 
     }
