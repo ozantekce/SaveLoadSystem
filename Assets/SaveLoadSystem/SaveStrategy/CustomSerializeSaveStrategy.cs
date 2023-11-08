@@ -1,12 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using static SaveLoadSystem.DataWrapper;
-using static UnityEditor.Progress;
 
 namespace SaveLoadSystem
 {
@@ -40,59 +35,21 @@ namespace SaveLoadSystem
             {
                 serializedData = decryptionKey.DecryptBytes(serializedData);
             }
-
-            return Deserialize(serializedData);
+            int offset = 0;
+            return Deserialize(serializedData, ref offset);
         }
 
-
-        public struct FieldNameChildPair
-        {
-            public string name;
-            public DataWrapper child;
-
-            public FieldNameChildPair(string name, DataWrapper child)
-            {
-                this.name = name;
-                this.child = child;
-            }
-        }
-
-        public struct FieldNameChildsListPair
-        {
-            public string name;
-            public DataWrapper childsList;
-
-            public FieldNameChildsListPair(string name, DataWrapper childsList)
-            {
-                this.name = name;
-                this.childsList = childsList;
-            }
-        }
 
 
         public static void Serialize(SaveableData saveableData, List<byte> serializedData)
         {
-            //List<byte> serializedData = new List<byte>();
+
             Dictionary<string, DataWrapper> fields = saveableData.Fields;
 
             serializedData.AddRange(BitConverter.GetBytes(fields.Count));
 
-
-
             foreach (var item in fields)
             {
-                /*
-                if(item.Value.Type == DataType.SaveableData)
-                {
-                    childs.Enqueue(new FieldNameChildPair(item.Key, item.Value));
-                    continue;
-                }
-                else if (item.Value.Type == DataType.List_SaveableData)
-                {
-                    childsLists.Enqueue(new FieldNameChildsListPair(item.Key, item.Value));
-                    continue;
-                }
-                */
 
                 byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(item.Key);
 
@@ -104,31 +61,6 @@ namespace SaveLoadSystem
 
             }
 
-            /*
-            while(childs.Count > 0)
-            {
-                FieldNameChildPair current = childs.Dequeue();
-                string fieldName = current.name;
-                DataWrapper sd = current.child;
-
-                byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(fieldName);
-                serializedData.AddRange(BitConverter.GetBytes(fieldNameBytes.Length));
-                serializedData.AddRange(fieldNameBytes);
-                ConvertToByteAndAdd(sd, serializedData, ref offset);
-            }
-
-            while (childsLists.Count > 0)
-            {
-                FieldNameChildsListPair current = childsLists.Dequeue();
-                string fieldName = current.name;
-                DataWrapper sd = current.childsList;
-
-                byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(fieldName);
-                serializedData.AddRange(BitConverter.GetBytes(fieldNameBytes.Length));
-                serializedData.AddRange(fieldNameBytes);
-                ConvertToByteAndAdd(sd, serializedData, ref offset);
-            }
-            */
 
             return;
         }
@@ -303,10 +235,9 @@ namespace SaveLoadSystem
             }
         }
 
-        public static SaveableData Deserialize(byte[] data)
+        public static SaveableData Deserialize(byte[] data, ref int offset)
         {
             SaveableData saveableData = new SaveableData();
-            int offset = 0;
 
             int fieldCount = data.BytesToInt(ref offset);
 
@@ -362,12 +293,8 @@ namespace SaveLoadSystem
                         fieldValue = data.GetDateTimeBytes(ref offset);
                         break;
                     case DataType.SaveableData:
-                        int saveableDataLength = data.BytesToInt(ref offset);
-                        byte[] saveableDataBytes = new byte[saveableDataLength];
-                        Array.Copy(data, offset, saveableDataBytes, 0, saveableDataLength);
-                        offset += saveableDataLength;
-
-                        fieldValue = Deserialize(saveableDataBytes);
+                        data.BytesToInt(ref offset);
+                        fieldValue = Deserialize(data, ref offset);
                         break;
                     case DataType.List_Int:
                         var intList = new List<int>();
@@ -436,12 +363,12 @@ namespace SaveLoadSystem
                         listCount = data.BytesToInt(ref offset);
                         for (int j = 0; j < listCount; j++)
                         {
-                            int saveableDataLengthTemp = data.BytesToInt(ref offset);
-                            byte[] saveableDataBytesTemp = new byte[saveableDataLengthTemp];
+                            data.BytesToInt(ref offset);
+                            /*byte[] saveableDataBytesTemp = new byte[saveableDataLengthTemp];
                             Array.Copy(data, offset, saveableDataBytesTemp, 0, saveableDataLengthTemp);
-                            offset += saveableDataLengthTemp;
+                            offset += saveableDataLengthTemp;*/
 
-                            var saveableDataTemp = Deserialize(saveableDataBytesTemp);
+                            var saveableDataTemp = Deserialize(data, ref offset);
                             saveableDataList.Add(saveableDataTemp);
                         }
                         fieldValue = saveableDataList;

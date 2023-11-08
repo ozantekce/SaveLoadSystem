@@ -330,9 +330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74c2a3951c3908b459ec921a7035fe8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveMode: 0
+  saveMode: 2
   fileName: SaveSlot1
-  randomTestSize: 50000
+  randomTestSize: 100000
 --- !u!4 &1435328343
 Transform:
   m_ObjectHideFlags: 0
