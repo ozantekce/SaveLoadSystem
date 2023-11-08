@@ -112,7 +112,7 @@ namespace SaveLoadSystem
                     stringBytes.AddRange(stringList.Count.IntToBytes());
                     stringList.ForEach(s => {
                         var strBytes = System.Text.Encoding.UTF8.GetBytes(s);
-                        stringBytes.AddRange(strBytes.Length.IntToBytes());
+                        stringBytes.AddRange(s.Length.IntToBytes());
                         stringBytes.AddRange(strBytes);
                     });
                     return stringBytes.ToArray();
@@ -212,6 +212,7 @@ namespace SaveLoadSystem
                 int fieldNameLength = data.BytesToInt(ref offset);
                 string fieldName = System.Text.Encoding.UTF8.GetString(data, offset, fieldNameLength);
                 offset += fieldNameLength;
+
 
                 // Determine data type
                 DataType dataType = (DataType)data[offset];

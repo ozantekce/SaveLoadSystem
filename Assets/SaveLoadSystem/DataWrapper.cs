@@ -22,7 +22,6 @@ namespace SaveLoadSystem
             Long,
             Double,
             Bool,
-            Char,
             String,
             //
 
@@ -42,7 +41,6 @@ namespace SaveLoadSystem
             List_Long,
             List_Double,
             List_Bool,
-            List_Char,
             List_String,
 
             List_Vector3,
@@ -54,25 +52,6 @@ namespace SaveLoadSystem
             List_SaveableData,
             //
 
-            /*
-            // Array
-            Array_Int,
-            Array_Float,
-            Array_Long,
-            Array_Double,
-            Array_Bool,
-            Array_Char,
-            Array_String,
-
-            Array_Vector3,
-            Array_Vector2,
-            Array_Color,
-            Array_Quaternion,
-            Array_DateTime,
-
-            Array_SaveableData,
-            //
-            */
         }
 
 
@@ -89,80 +68,6 @@ namespace SaveLoadSystem
             v = data;
             t = dataType;
         }
-
-        /*
-        public DataWrapper(int data)
-        {
-            t = DataType.Int;
-            v = data;
-        }
-        public DataWrapper(float data)
-        {
-            t = DataType.Float;
-            v = data;
-        }
-        public DataWrapper(long data)
-        {
-            t = DataType.Long;
-            v = data;
-        }
-        public DataWrapper(double data)
-        {
-            t = DataType.Double;
-            v = data;
-        }
-        public DataWrapper(bool data)
-        {
-            t = DataType.Bool;
-            v = data;
-        }
-        public DataWrapper(char data)
-        {
-            t = DataType.Char;
-            v = data;
-        }
-        public DataWrapper(string data)
-        {
-            t = DataType.String;
-            v = data;
-        }
-
-        public DataWrapper(Vector3 data)
-        {
-            t = DataType.Vector3;
-            v = data;
-        }
-
-        public DataWrapper(Vector2 data)
-        {
-            t = DataType.Vector2;
-            v = data;
-        }
-
-        public DataWrapper(Color data)
-        {
-            t = DataType.Color;
-            v = data;
-        }
-
-        public DataWrapper(Quaternion data)
-        {
-            t = DataType.Quaternion;
-            v = data;
-        }
-
-        public DataWrapper(DateTime data)
-        {
-            t = DataType.DateTime;
-            v = data;
-        }
-
-        public DataWrapper(SaveableData saveableData)
-        {
-            t = DataType.SaveableData;
-            v = saveableData;
-        }
-        */
 
 
         public T GetValue<T>()
@@ -190,7 +95,6 @@ namespace SaveLoadSystem
             }
             else if (t == DataType.List_Vector3)
             {
-                Debug.Log(v);
                 return (T)(object)SerializableConverter.ConvertToObjectList<Vector3>((List<byte[]>)v);
             }
             else if (t == DataType.List_Vector2)
@@ -223,10 +127,9 @@ namespace SaveLoadSystem
                 long l => new DataWrapper(l, DataType.Long),
                 double d => new DataWrapper(d, DataType.Double),
                 bool b => new DataWrapper(b, DataType.Bool),
-                char c => new DataWrapper(c, DataType.Char),
                 string s => new DataWrapper(s, DataType.String),
 
-                Vector3 v3 => new DataWrapper(v3.Vector3ToBytes(), DataType.Vector2),
+                Vector3 v3 => new DataWrapper(v3.Vector3ToBytes(), DataType.Vector3),
                 Vector2 v2 => new DataWrapper(v2.Vector2ToBytes(), DataType.Vector2),
                 Color c => new DataWrapper(c.ColorToBytes(), DataType.Color),
                 Quaternion q => new DataWrapper(q.QuaternionToBytes(), DataType.Quaternion),
@@ -238,7 +141,6 @@ namespace SaveLoadSystem
                 List<long> listLong => new DataWrapper(listLong, DataType.List_Long),
                 List<double> listDouble => new DataWrapper(listDouble, DataType.List_Double),
                 List<bool> listBool => new DataWrapper(listBool, DataType.List_Bool),
-                List<char> listChar => new DataWrapper(listChar, DataType.List_Char),
                 List<string> listString => new DataWrapper(listString, DataType.List_String),
                 List<Vector3> listVector3 => new DataWrapper(listVector3.ConvertToBytesList(), DataType.List_Vector3),
                 List<Vector2> listVector2 => new DataWrapper(listVector2.ConvertToBytesList(), DataType.List_Vector2),

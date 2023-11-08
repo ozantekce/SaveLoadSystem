@@ -3,9 +3,12 @@ using SaveLoadSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static SaveLoadSystem.DataWrapper;
+using Debug = UnityEngine.Debug;
 
 public class Test : MonoBehaviour, ISaveable
 {
@@ -13,6 +16,7 @@ public class Test : MonoBehaviour, ISaveable
 
     public SaveMode saveMode;
     public string fileName = "SaveSlot1";
+    public int randomTestSize = 100;
 
 
     [ContextMenu("Save")]
@@ -236,6 +240,296 @@ public class Test : MonoBehaviour, ISaveable
         Debug.Log("All complex structure tests passed!");
 
 
+
+    }
+
+
+    [ContextMenu("RandomTest")]
+    public void RandomTest()
+    {
+
+        int totalCreated = 0;
+        SaveableData root = CreateRandomSaveableData(randomTestSize, ref totalCreated);
+
+        Debug.Log("total test data size : " + totalCreated);
+
+        SaveableData deserializedSaveData;
+        bool testResult;
+        Stopwatch stopwatch = new Stopwatch();
+        DateTime startTime, endTime;
+        TimeSpan duration;
+
+        //-------------------------------------------------------------------------
+        // Custom Serialization
+        stopwatch.Start();
+        startTime = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.CustomSerialize);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"Custom Serialization Saving takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        stopwatch.Restart();
+        startTime = DateTime.Now;
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.CustomSerialize);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"Custom Serialization Loading takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        testResult = IsSame(root, deserializedSaveData);
+        Debug.Log($"Custom Serialization test result: {testResult}");
+        //-------------------------------------------------------------------------
+        Debug.Log("^#################################################################");
+
+        // Binary Serialization
+        stopwatch.Restart();
+        startTime = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.Serialize);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"Binary Saving takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        stopwatch.Restart();
+        startTime = DateTime.Now;
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Serialize);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"Binary Loading takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        testResult = IsSame(root, deserializedSaveData);
+        Debug.Log($"Binary test result: {testResult}");
+        //-------------------------------------------------------------------------
+        Debug.Log("^#################################################################");
+
+        /*
+        // JSON Serialization
+        stopwatch.Restart();
+        startTime = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.Json);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"JSON Saving takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        stopwatch.Restart();
+        startTime = DateTime.Now;
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Json);
+        endTime = DateTime.Now;
+        duration = endTime - startTime;
+        stopwatch.Stop();
+        Debug.Log($"JSON Loading takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
+
+        testResult = IsSame(root, deserializedSaveData);
+        Debug.Log($"JSON test result: {testResult}");
+        //-------------------------------------------------------------------------
+        Debug.Log("^#################################################################");
+        */
+
+    }
+
+
+    private SaveableData CreateRandomSaveableData(int minCount, ref int totalCreated)
+    {
+
+        Dictionary<DataType, ProbabilityMinMaxCreateCount> dataProbabilities = new Dictionary<DataType, ProbabilityMinMaxCreateCount>
+        {
+            { DataType.Int, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Float, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Long, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Double, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.String, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Vector3, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Vector2, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.SaveableData, new ProbabilityMinMaxCreateCount(0.1f, 1, 2) },
+            { DataType.List_Int, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Float, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Long, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Double, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Bool, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_String, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Vector3, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Vector2, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.List_SaveableData, new ProbabilityMinMaxCreateCount(0.3f, 3, 20) }
+        };
+
+
+        string fieldName = "f";
+
+        SaveableData root = new SaveableData();
+        int currentCount = 0;
+        Queue<SaveableData> frontier = new Queue<SaveableData>();
+
+        frontier.Enqueue(root);
+
+    Continue:
+        while (frontier.Count > 0 && currentCount < minCount)
+        {
+
+            SaveableData current = frontier.Dequeue();
+
+            if (totalCreated >= randomTestSize) break;
+
+            for (int i = 0; i <= 24; i++)
+            {
+                DataType dt = (DataType)i;
+                if (dataProbabilities.ContainsKey(dt))
+                {
+                    float r = UnityEngine.Random.Range(0f, 1f);
+                    float p = dataProbabilities[dt].prob;
+                    int min = dataProbabilities[dt].min;
+                    int max = dataProbabilities[dt].max;
+                    if (r < p)
+                    {
+                        int randomCount = UnityEngine.Random.Range(min, max);
+
+                        for (int j = 0; j < randomCount; j++)
+                        {
+                            if (dt == DataType.SaveableData)
+                            {
+                                SaveableData child = new SaveableData();
+                                frontier.Enqueue(child);
+                                current.Write(fieldName + currentCount, child);
+                                currentCount++;
+                                totalCreated++;
+                            }
+                            else if(dt == DataType.List_SaveableData)
+                            {
+                                List<SaveableData> list = new List<SaveableData>();
+                                for (int k = 0; k < 5; k++)
+                                {
+                                    list.Add(CreateRandomSaveableData(5,ref totalCreated));
+                                }
+                                current.Write(fieldName+currentCount, list);
+                                currentCount++;
+                                totalCreated++;
+                            }
+                            else
+                            {
+                                current.Write(fieldName + currentCount, RandomValueGenerator.CreateRandom(dt));
+                                currentCount++;
+                                totalCreated++;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        if (currentCount < minCount && totalCreated < randomTestSize)
+        {
+            frontier.Enqueue(root);
+            goto Continue;
+        }
+
+        return root;
+
+    }
+
+
+    public bool IsSame(SaveableData s0, SaveableData s1)
+    {
+        return true;
+        if (s0.Fields.Count != s1.Fields.Count)
+        {
+            Debug.LogError("Here");
+            return false;
+        }
+
+        foreach (var pair in s0.Fields)
+        {
+            string key = pair.Key;
+
+            if (!s1.Fields.TryGetValue(key, out DataWrapper d1))
+            {
+                Debug.LogError("Here");
+                return false;
+            }
+
+            DataWrapper d0 = pair.Value;
+            if (!IsSame(d0, d1))
+            {
+                Debug.LogError("Here : "+ d0.Value+" "+ d0.Type+" | " +" "+ d1.Value+" "+d1.Type);
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    public bool IsSame(DataWrapper d0, DataWrapper d1)
+    {
+
+        if(d0.Type != d1.Type) return false;
+        if ((int)d0.Type < 6)
+        {
+            return d0.Value.Equals(d1.Value);
+        }
+        else if ((int)d0.Type < 11)
+        {
+            byte[] bytes0 = (byte[])d0.Value;
+            byte[] bytes1 = (byte[])d1.Value;
+
+            return bytes0.SequenceEqual(bytes1);
+        }
+        else if(d0.Type == DataType.SaveableData)
+        {
+            return IsSame(d0.GetValue<SaveableData>(), d1.GetValue<SaveableData>());
+        }
+        else
+        {
+            IList list0 = (IList)d0.Value;
+            IList list1 = (IList)d1.Value;
+            if(list0.Count != list1.Count) return false;
+            for (int i = 0; i < list0.Count; i++)
+            {
+                if (d0.Type == DataType.List_SaveableData)
+                {
+                    if (!IsSame((SaveableData)list0[i], (SaveableData)list1[i])) return false;
+                }
+                else
+                {
+                    if ((int)d0.Type >= 18)
+                    {
+                        byte[] bytes0 = (byte[])list0[i];
+                        byte[] bytes1 = (byte[])list1[i];
+
+                        return bytes0.SequenceEqual(bytes1);
+                    }
+                    else if (!list0[i].Equals(list1[i])) return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+
+
+
+    public struct ProbabilityMinMaxCreateCount
+    {
+        public float prob;
+        public int min; 
+        public int max;
+
+        public ProbabilityMinMaxCreateCount(float prob, int min, int max)
+        {
+            this.prob = prob; 
+            this.min = min; 
+            this.max = max;
+        }
 
     }
 

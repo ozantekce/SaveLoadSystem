@@ -331,6 +331,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveMode: 0
+  fileName: SaveSlot1
+  randomTestSize: 50000
 --- !u!4 &1435328343
 Transform:
   m_ObjectHideFlags: 0

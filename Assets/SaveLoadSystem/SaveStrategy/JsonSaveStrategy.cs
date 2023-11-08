@@ -78,7 +78,6 @@ namespace SaveLoadSystem
                 DataType.Long => new DataWrapper(data.ToObject<long>(), DataType.Long),
                 DataType.Double => new DataWrapper(data.ToObject<double>(), DataType.Double),
                 DataType.Bool => new DataWrapper(data.ToObject<bool>(), DataType.Bool),
-                DataType.Char => new DataWrapper(data.ToObject<char>(), DataType.Char),
                 DataType.String => new DataWrapper(data.ToObject<string>(), DataType.String),
 
                 DataType.Vector3 => new DataWrapper(data.ToObject<byte[]>(), DataType.Vector3),
@@ -93,7 +92,6 @@ namespace SaveLoadSystem
                 DataType.List_Long => new DataWrapper(data.ToObject<List<long>>(serializer), DataType.List_Long),
                 DataType.List_Double => new DataWrapper(data.ToObject<List<double>>(serializer), DataType.List_Double),
                 DataType.List_Bool => new DataWrapper(data.ToObject<List<bool>>(serializer), DataType.List_Bool),
-                DataType.List_Char => new DataWrapper(data.ToObject<List<char>>(serializer), DataType.List_Char),
                 DataType.List_String => new DataWrapper(data.ToObject<List<string>>(serializer), DataType.List_String),
                 DataType.List_Vector3 => new DataWrapper(data.ToObject<List<byte[]>>(serializer), DataType.List_Vector3),
                 DataType.List_Vector2 => new DataWrapper(data.ToObject<List<byte[]>>(serializer), DataType.List_Vector2),
