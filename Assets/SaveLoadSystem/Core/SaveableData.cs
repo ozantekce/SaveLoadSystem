@@ -14,10 +14,7 @@ namespace SaveLoadSystem.Core
     {
 
         [JsonProperty] private Dictionary<string, DataWrapper> fields;
-
         [JsonIgnore] public Dictionary<string, DataWrapper> Fields { get => fields; }
-
-
 
         public SaveableData()
         {
@@ -29,10 +26,6 @@ namespace SaveLoadSystem.Core
             fields = fieldToData;
         }
 
-
-
-
-
         public void Write<T>(string field, T value)
         {
             if (fields.ContainsKey(field))
@@ -40,24 +33,37 @@ namespace SaveLoadSystem.Core
                 throw new ArgumentException($"A field with the name '{field}' already exists. Duplicate fields are not allowed.");
             }
             fields[field] = DataWrapper.Create(value);
-
         }
 
 
+        public void Update<T>(string field, T value)
+        {
+            fields[field] = DataWrapper.Create(value);
+        }
+
         public T Read<T>(string field)
         {
+            if (!fields.ContainsKey(field))
+            {
+                Debug.LogError($"A field with the name '{field}' not exists. Returning default value: '{default(T)}'");
+                return default;
+            }
+
             return fields[field].GetValue<T>();
         }
 
         public object Read(string field)
         {
+            if (!fields.ContainsKey(field))
+            {
+                Debug.LogError($"A field with the name '{field}' not exists. Returning default value");
+                return default;
+            }
             return fields[field].GetValue();
         }
 
-
         public bool TryRead<T>(string field, out T data)
         {
-
             if (fields.ContainsKey(field))
             {
                 data = Read<T>(field);
@@ -70,10 +76,9 @@ namespace SaveLoadSystem.Core
             }
         }
 
-
         public bool TryRead(string fieldName, out object loadedValue)
         {
-            if (fields.TryGetValue(fieldName, out DataWrapper dataWrapper))
+            if (fields.ContainsKey(fieldName))
             {
                 loadedValue = Read(fieldName);
                 return true;
@@ -85,6 +90,29 @@ namespace SaveLoadSystem.Core
             }
         }
 
+        public T ReadOrDefault<T>(string field, T defaultValue)
+        {
+            if (!fields.ContainsKey(field))
+            {
+                return defaultValue;
+            }
+            else
+            {
+                return fields[field].GetValue<T>();
+            }
+        }
+
+        public T ReadOrDefault<T>(string field)
+        {
+            if (!fields.ContainsKey(field))
+            {
+                return default;
+            }
+            else
+            {
+                return fields[field].GetValue<T>();
+            }
+        }
 
     }
 

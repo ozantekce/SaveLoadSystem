@@ -23,7 +23,7 @@ namespace SaveLoadSystem.Core
         SaveableData = 11,
         //
 
-        // List
+        // Lists
         List_Int = 12,
         List_Float = 13,
         List_Long = 14,

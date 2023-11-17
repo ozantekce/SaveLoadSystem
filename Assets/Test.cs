@@ -14,11 +14,15 @@ using Debug = UnityEngine.Debug;
 public class Test : MonoBehaviour
 {
 
+    public SaveMode saveMode;
+    public string fileName = "SaveSlot1";
+    public int randomTestSize = 100;
 
 
-    private void Awake()
+
+    public void SchemaExample()
     {
-        
+
         PlayerData playerData = new PlayerData();
         playerData.name = "player";
         playerData.hp = 100;
@@ -39,18 +43,12 @@ public class Test : MonoBehaviour
 
         SaveableData loadedData = SaveLoadManager.Load("playerSaveData", saveMode);
 
+
         PlayerData loadedPlayerData = new PlayerData(loadedData);
 
 
         Debug.Log(loadedPlayerData);
-
-
-
     }
-
-    public SaveMode saveMode;
-    public string fileName = "SaveSlot1";
-    public int randomTestSize = 100;
 
 
 
@@ -333,7 +331,7 @@ public class Test : MonoBehaviour
         duration = endTime - startTime;
         stopwatch.Stop();
         Debug.Log($"Custom Serialization Saving takes: {stopwatch.ElapsedMilliseconds} ms (Stopwatch) | {duration.TotalMilliseconds} ms (DateTime)");
-
+        
         stopwatch.Restart();
         startTime = DateTime.Now;
         deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.CustomSerialize);
@@ -346,7 +344,7 @@ public class Test : MonoBehaviour
         Debug.Log($"Custom Serialization test result: {testResult}");
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
-
+        /*
         // Binary Serialization
         stopwatch.Restart();
         startTime = DateTime.Now;
@@ -391,7 +389,7 @@ public class Test : MonoBehaviour
         Debug.Log($"JSON test result: {testResult}");
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
-        
+        */
 
     }
 

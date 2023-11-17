@@ -55,7 +55,7 @@ namespace SaveLoadSystem
             }
 
 
-            foreach (FieldInfo field in this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (FieldInfo field in this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public))
             {
                 if (field.IsDefined(typeof(SaveFieldAttribute), true))
                 {
@@ -84,7 +84,7 @@ namespace SaveLoadSystem
                 transform.localScale = sca;
             }
 
-            foreach (FieldInfo field in this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            foreach (FieldInfo field in this.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public))
             {
                 if (field.IsDefined(typeof(SaveFieldAttribute), true))
                 {

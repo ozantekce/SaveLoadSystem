@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
-using static SaveLoadSystem.Core.DataWrapper;
 
 namespace SaveLoadSystem.Core
 {
@@ -140,8 +139,8 @@ namespace SaveLoadSystem.Core
         {
             if(!useCache) return BitConverter.GetBytes(value);
 
-            int intValue = BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
-            return intValue.IntToBytes();
+            int intValue = BitConverter.SingleToInt32Bits(value);
+            return intValue.IntToBytes(true);
         }
 
         public static float BytesToFloat(this byte[] value, int offset = 0)
@@ -183,7 +182,7 @@ namespace SaveLoadSystem.Core
 
             // Convert double to long representation
             long longValue = BitConverter.DoubleToInt64Bits(value);
-            return longValue.LongToBytes(); // Reuse the LongToBytes method
+            return longValue.LongToBytes(true); // Reuse the LongToBytes method
 
         }
 
@@ -204,10 +203,13 @@ namespace SaveLoadSystem.Core
 
         public static byte[] Vector3ToBytes(this Vector3 value)
         {
-            return BitConverter.GetBytes(value.x)
-                .Concat(BitConverter.GetBytes(value.y))
-                .Concat(BitConverter.GetBytes(value.z))
-                .ToArray();
+            byte[] bytes = new byte[12]; // 3 floats * 4 bytes per float
+
+            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
+            Array.Copy(value.z.FloatToBytes(true), 0, bytes, 8, 4);
+
+            return bytes;
         }
 
         public static Vector3 BytesToVector3(this byte[] value, int offset = 0)
@@ -220,10 +222,14 @@ namespace SaveLoadSystem.Core
 
         public static byte[] Vector2ToBytes(this Vector2 value)
         {
-            return BitConverter.GetBytes(value.x)
-                .Concat(BitConverter.GetBytes(value.y))
-                .ToArray();
+            byte[] bytes = new byte[8]; // 2 floats * 4 bytes per float
+
+            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
+
+            return bytes;
         }
+
 
         public static Vector2 BytesToVector2(this byte[] value, int offset = 0)
         {
@@ -234,11 +240,14 @@ namespace SaveLoadSystem.Core
 
         public static byte[] ColorToBytes(this Color value)
         {
-            return BitConverter.GetBytes(value.r)
-                .Concat(BitConverter.GetBytes(value.g))
-                .Concat(BitConverter.GetBytes(value.b))
-                .Concat(BitConverter.GetBytes(value.a))
-                .ToArray();
+            byte[] bytes = new byte[16]; // 4 floats * 4 bytes per float
+
+            Array.Copy(value.r.FloatToBytes(true), 0, bytes, 0, 4);
+            Array.Copy(value.g.FloatToBytes(true), 0, bytes, 4, 4);
+            Array.Copy(value.b.FloatToBytes(true), 0, bytes, 8, 4);
+            Array.Copy(value.a.FloatToBytes(true), 0, bytes, 12, 4);
+
+            return bytes;
         }
 
         public static Color BytesToColor(this byte[] value, int offset = 0)
@@ -252,11 +261,14 @@ namespace SaveLoadSystem.Core
 
         public static byte[] QuaternionToBytes(this Quaternion value)
         {
-            return BitConverter.GetBytes(value.x)
-                .Concat(BitConverter.GetBytes(value.y))
-                .Concat(BitConverter.GetBytes(value.z))
-                .Concat(BitConverter.GetBytes(value.w))
-                .ToArray();
+            byte[] bytes = new byte[16]; // 4 floats * 4 bytes per float
+
+            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
+            Array.Copy(value.z.FloatToBytes(true), 0, bytes, 8, 4);
+            Array.Copy(value.w.FloatToBytes(true), 0, bytes, 12, 4);
+
+            return bytes;
         }
 
         public static Quaternion BytesToQuaternion(this byte[] value, int offset = 0)

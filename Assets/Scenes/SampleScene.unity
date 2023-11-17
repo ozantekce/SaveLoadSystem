@@ -159,7 +159,7 @@ MonoBehaviour:
   _savePosition: 1
   _saveRotation: 1
   _saveScale: 1
-  _name: Deneme
+  _name: 
   _hp: 100
 --- !u!65 &255218247
 BoxCollider:
@@ -448,7 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveMode: 2
   fileName: SaveSlot1
-  randomTestSize: 10000
+  randomTestSize: 800000
 --- !u!4 &1435328343
 Transform:
   m_ObjectHideFlags: 0
