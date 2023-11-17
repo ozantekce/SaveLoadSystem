@@ -448,7 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveMode: 2
   fileName: SaveSlot1
-  randomTestSize: 10
+  randomTestSize: 10000
 --- !u!4 &1435328343
 Transform:
   m_ObjectHideFlags: 0

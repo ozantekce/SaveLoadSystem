@@ -39,6 +39,8 @@ namespace SaveLoadSystem.Core
         };
 
 
+
+
         private static readonly Dictionary<Type, Func<object, byte[]>> SerializableConversionStrategies = new Dictionary<Type, Func<object, byte[]>>
         {
             { typeof(Vector3), data => Vector3ToBytes((Vector3)data) },
@@ -59,10 +61,8 @@ namespace SaveLoadSystem.Core
 
 
 
-        private static bool UseCache = true;
-
-        private static byte[] IntBytes = new byte[4];
-        private static byte[] LongBytes = new byte[8];
+        private static byte[] IntBytesCache = new byte[4];
+        private static byte[] LongBytesCache = new byte[8];
 
 
         public static byte[] ConvertToBytes<T>(this T data)
@@ -107,28 +107,28 @@ namespace SaveLoadSystem.Core
         }
 
 
-        public static byte[] IntToBytes(this int value)
+        public static byte[] IntToBytes(this int value, bool useCache = true)
         {
-            if(!UseCache) return BitConverter.GetBytes(value);
+            if(!useCache) return BitConverter.GetBytes(value);
 
             if (BitConverter.IsLittleEndian)
             {
                 // Little-endian: least significant byte first
-                IntBytes[0] = (byte)value;
-                IntBytes[1] = (byte)(value >> 8);
-                IntBytes[2] = (byte)(value >> 16);
-                IntBytes[3] = (byte)(value >> 24);
+                IntBytesCache[0] = (byte)value;
+                IntBytesCache[1] = (byte)(value >> 8);
+                IntBytesCache[2] = (byte)(value >> 16);
+                IntBytesCache[3] = (byte)(value >> 24);
             }
             else
             {
                 // Big-endian: most significant byte first
-                IntBytes[0] = (byte)(value >> 24);
-                IntBytes[1] = (byte)(value >> 16);
-                IntBytes[2] = (byte)(value >> 8);
-                IntBytes[3] = (byte)value;
+                IntBytesCache[0] = (byte)(value >> 24);
+                IntBytesCache[1] = (byte)(value >> 16);
+                IntBytesCache[2] = (byte)(value >> 8);
+                IntBytesCache[3] = (byte)value;
             }
 
-            return IntBytes;
+            return IntBytesCache;
         }
 
         public static int BytesToInt(this byte[] value, int offset = 0)
@@ -136,9 +136,9 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToInt32(value, offset);
         }
 
-        public static byte[] FloatToBytes(this float value)
+        public static byte[] FloatToBytes(this float value, bool useCache = true)
         {
-            if(!UseCache) return BitConverter.GetBytes(value);
+            if(!useCache) return BitConverter.GetBytes(value);
 
             int intValue = BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
             return intValue.IntToBytes();
@@ -149,27 +149,27 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToSingle(value, offset);
         }
 
-        public static byte[] LongToBytes(this long value)
+        public static byte[] LongToBytes(this long value, bool useCache = true)
         {
-            if(!UseCache) return BitConverter.GetBytes(value);
+            if(!useCache) return BitConverter.GetBytes(value);
 
 
             if (BitConverter.IsLittleEndian)
             {
-                for (int i = 0; i < LongBytes.Length; i++)
+                for (int i = 0; i < LongBytesCache.Length; i++)
                 {
-                    LongBytes[i] = (byte)(value >> (8 * i));
+                    LongBytesCache[i] = (byte)(value >> (8 * i));
                 }
             }
             else
             {
-                for (int i = 0; i < LongBytes.Length; i++)
+                for (int i = 0; i < LongBytesCache.Length; i++)
                 {
-                    LongBytes[7 - i] = (byte)(value >> (8 * i));
+                    LongBytesCache[7 - i] = (byte)(value >> (8 * i));
                 }
             }
 
-            return LongBytes;
+            return LongBytesCache;
         }
 
         public static long BytesToLong(this byte[] value, int offset = 0)
@@ -177,9 +177,9 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToInt64(value, offset);
         }
 
-        public static byte[] DoubleToBytes(this double value)
+        public static byte[] DoubleToBytes(this double value, bool useCache = true)
         {
-            if(!UseCache) return BitConverter.GetBytes(value);
+            if(!useCache) return BitConverter.GetBytes(value);
 
             // Convert double to long representation
             long longValue = BitConverter.DoubleToInt64Bits(value);

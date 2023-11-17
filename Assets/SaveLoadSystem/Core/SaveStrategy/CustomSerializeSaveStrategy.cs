@@ -52,14 +52,14 @@ namespace SaveLoadSystem.Core
 
             Dictionary<string, DataWrapper> fields = saveableData.Fields;
 
-            serializedData.AddRange(BitConverter.GetBytes(fields.Count));
+            serializedData.AddRange(fields.Count.IntToBytes());   
 
             foreach (var item in fields)
             {
 
                 byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(item.Key);
 
-                serializedData.AddRange(fieldNameBytes.Length.IntToBytes());
+                serializedData.AddRange(fieldNameBytes.Length.IntToBytes());    
                 serializedData.AddRange(fieldNameBytes);
 
                 ConvertToByteAndAdd(item.Value, serializedData);
@@ -95,7 +95,6 @@ namespace SaveLoadSystem.Core
                 case DataType.Double:
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     refSerializedData.AddRange(data.GetValue<double>().DoubleToBytes());
-
                     return;
                 case DataType.Bool:
                     refSerializedData.Add(data.Type.DataTypeToByte());
@@ -108,7 +107,6 @@ namespace SaveLoadSystem.Core
                 case DataType.Vector2:
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     refSerializedData.AddRange(data.Bytes);
-
                     return;
                 case DataType.Color:
                     refSerializedData.Add(data.Type.DataTypeToByte());
@@ -126,8 +124,6 @@ namespace SaveLoadSystem.Core
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     int currentOffset = refSerializedData.Count;
                     Serialize(data.GetValue<SaveableData>(), refSerializedData);
-                    int added = refSerializedData.Count - currentOffset;
-                    refSerializedData.InsertRange(currentOffset, added.IntToBytes());
                     return;
                 case DataType.List_Int:
                     List<int> intList = data.GetValue<List<int>>();
@@ -229,10 +225,7 @@ namespace SaveLoadSystem.Core
                     refSerializedData.AddRange(saveableDataList.Count.IntToBytes());
                     for (int i = 0; i < saveableDataList.Count; i++)
                     {
-                        currentOffset = refSerializedData.Count;
                         Serialize(saveableDataList[i], refSerializedData);
-                        added = refSerializedData.Count - currentOffset;
-                        refSerializedData.InsertRange(currentOffset, added.IntToBytes());
                     }
                     return;
 
@@ -299,7 +292,6 @@ namespace SaveLoadSystem.Core
                         fieldValue = data.GetDateTimeBytes(ref offset);
                         break;
                     case DataType.SaveableData:
-                        data.BytesToInt(ref offset);
                         fieldValue = Deserialize(data, ref offset);
                         break;
                     case DataType.List_Int:
@@ -369,11 +361,6 @@ namespace SaveLoadSystem.Core
                         listCount = data.BytesToInt(ref offset);
                         for (int j = 0; j < listCount; j++)
                         {
-                            data.BytesToInt(ref offset);
-                            /*byte[] saveableDataBytesTemp = new byte[saveableDataLengthTemp];
-                            Array.Copy(data, offset, saveableDataBytesTemp, 0, saveableDataLengthTemp);
-                            offset += saveableDataLengthTemp;*/
-
                             var saveableDataTemp = Deserialize(data, ref offset);
                             saveableDataList.Add(saveableDataTemp);
                         }

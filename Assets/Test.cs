@@ -15,9 +15,43 @@ public class Test : MonoBehaviour
 {
 
 
+
+    private void Awake()
+    {
+        
+        PlayerData playerData = new PlayerData();
+        playerData.name = "player";
+        playerData.hp = 100;
+        playerData.mp = 100;
+        playerData.inventory = new InventoryData();
+
+        List<ItemData> itemDatas = playerData.inventory.items = new List<ItemData>();
+
+        itemDatas.Add(new ItemData("dagger", 20f));
+        itemDatas.Add(new ItemData("sword", 100));
+
+
+
+        SaveableData playerSaveData = playerData.ConvertToSaveableData();
+
+
+        SaveLoadManager.Save(playerSaveData, "playerSaveData", saveMode);
+
+        SaveableData loadedData = SaveLoadManager.Load("playerSaveData", saveMode);
+
+        PlayerData loadedPlayerData = new PlayerData(loadedData);
+
+
+        Debug.Log(loadedPlayerData);
+
+
+
+    }
+
     public SaveMode saveMode;
     public string fileName = "SaveSlot1";
     public int randomTestSize = 100;
+
 
 
     [ContextMenu("Save")]
@@ -335,7 +369,7 @@ public class Test : MonoBehaviour
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
 
-        /*
+        
         // JSON Serialization
         stopwatch.Restart();
         startTime = DateTime.Now;
@@ -357,7 +391,7 @@ public class Test : MonoBehaviour
         Debug.Log($"JSON test result: {testResult}");
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
-        */
+        
 
     }
 
@@ -371,25 +405,25 @@ public class Test : MonoBehaviour
             { DataType.Float, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Long, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Double, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.String, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
+            { DataType.String, new ProbabilityMinMaxCreateCount(0.3f, 3, 20) },
             { DataType.Vector3, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Vector2, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.SaveableData, new ProbabilityMinMaxCreateCount(0.3f, 1, 2) },
-            { DataType.List_Int, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Float, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Long, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Double, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Bool, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_String, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Vector3, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Vector2, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.List_SaveableData, new ProbabilityMinMaxCreateCount(0.3f, 3, 20) }
+            { DataType.List_Int, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Float, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Long, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Double, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Bool, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_String, new ProbabilityMinMaxCreateCount(0.05f, 1, 5) },
+            { DataType.List_Vector3, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Vector2, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Color, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_Quaternion, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_DateTime, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
+            { DataType.List_SaveableData, new ProbabilityMinMaxCreateCount(0.02f, 1, 1) }
         };
 
 

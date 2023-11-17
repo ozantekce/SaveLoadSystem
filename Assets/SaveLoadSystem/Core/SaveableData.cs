@@ -15,7 +15,9 @@ namespace SaveLoadSystem.Core
 
         [JsonProperty] private Dictionary<string, DataWrapper> fields;
 
-        public Dictionary<string, DataWrapper> Fields { get => fields; }
+        [JsonIgnore] public Dictionary<string, DataWrapper> Fields { get => fields; }
+
+
 
         public SaveableData()
         {
@@ -26,6 +28,9 @@ namespace SaveLoadSystem.Core
         {
             fields = fieldToData;
         }
+
+
+
 
 
         public void Write<T>(string field, T value)
