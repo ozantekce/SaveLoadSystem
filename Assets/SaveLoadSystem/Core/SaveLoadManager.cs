@@ -39,7 +39,7 @@ namespace SaveLoadSystem.Core
 
         public static void Save(ISaveable saveable, string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, bool encrypt = false)
         {
-            Save(saveable.CreateSaveData(), fileName, saveStrategy, encrypt);
+            Save(saveable.ConvertToSaveableData(), fileName, saveStrategy, encrypt);
         }
 
 

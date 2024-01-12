@@ -13,7 +13,7 @@ namespace SaveLoadSystem.Core
         public void LoadSavedData(SaveableData data);
 
 
-        public SaveableData CreateSaveData();
+        public SaveableData ConvertToSaveableData();
 
 
 

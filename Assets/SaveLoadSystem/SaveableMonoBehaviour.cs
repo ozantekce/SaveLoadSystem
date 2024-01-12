@@ -18,11 +18,6 @@ namespace SaveLoadSystem
         [SerializeField] private bool _saveScale;
 
 
-
-        [SaveField][SerializeField] private string _name;
-        [SaveField][SerializeField] private float _hp;
-
-
         protected virtual void Awake()
         {
             SaveableData savedData = SaveLoadManager.Load(_id);
@@ -37,7 +32,7 @@ namespace SaveLoadSystem
         }
 
 
-        public SaveableData CreateSaveData()
+        public SaveableData ConvertToSaveableData()
         {
             SaveableData saveData = new SaveableData();
 
