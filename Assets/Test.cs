@@ -5,10 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using UnityEngine;
-using static SaveLoadSystem.Core.DataWrapper;
 using Debug = UnityEngine.Debug;
 
 public class Test : MonoBehaviour
@@ -17,38 +15,6 @@ public class Test : MonoBehaviour
     public SaveMode saveMode;
     public string fileName = "SaveSlot1";
     public int randomTestSize = 100;
-
-
-
-    public void SchemaExample()
-    {
-
-        PlayerData playerData = new PlayerData();
-        playerData.name = "player";
-        playerData.hp = 100;
-        playerData.mp = 100;
-        playerData.inventory = new InventoryData();
-
-        List<ItemData> itemDatas = playerData.inventory.items = new List<ItemData>();
-
-        itemDatas.Add(new ItemData("dagger", 20f));
-        itemDatas.Add(new ItemData("sword", 100));
-
-
-
-        SaveableData playerSaveData = playerData.ConvertToSaveableData();
-
-
-        SaveLoadManager.Save(playerSaveData, "playerSaveData", saveMode);
-
-        SaveableData loadedData = SaveLoadManager.Load("playerSaveData", saveMode);
-
-
-        PlayerData loadedPlayerData = new PlayerData(loadedData);
-
-
-        Debug.Log(loadedPlayerData);
-    }
 
 
 

@@ -1,9 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-
 namespace SaveLoadSystem.Core
 {
 
@@ -14,8 +8,6 @@ namespace SaveLoadSystem.Core
 
 
         public SaveableData ConvertToSaveableData();
-
-
 
 
     }
