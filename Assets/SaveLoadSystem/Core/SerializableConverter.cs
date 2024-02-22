@@ -9,37 +9,6 @@ namespace SaveLoadSystem.Core
     {
 
 
-        public static readonly Dictionary<DataType, byte> DataTypeToByteDict = new Dictionary<DataType, byte>
-        {
-            { DataType.Int, (byte)DataType.Int },
-            { DataType.Float, (byte)DataType.Float },
-            { DataType.Long, (byte)DataType.Long },
-            { DataType.Double, (byte)DataType.Double },
-            { DataType.Bool, (byte)DataType.Bool },
-            { DataType.String, (byte)DataType.String },
-            { DataType.Vector3, (byte)DataType.Vector3 },
-            { DataType.Vector2, (byte)DataType.Vector2 },
-            { DataType.Color, (byte)DataType.Color },
-            { DataType.Quaternion, (byte)DataType.Quaternion },
-            { DataType.DateTime, (byte)DataType.DateTime },
-            { DataType.SaveableData, (byte)DataType.SaveableData },
-            { DataType.List_Int, (byte)DataType.List_Int },
-            { DataType.List_Float, (byte)DataType.List_Float },
-            { DataType.List_Long, (byte)DataType.List_Long },
-            { DataType.List_Double, (byte)DataType.List_Double },
-            { DataType.List_Bool, (byte)DataType.List_Bool },
-            { DataType.List_String, (byte)DataType.List_String },
-            { DataType.List_Vector3, (byte)DataType.List_Vector3 },
-            { DataType.List_Vector2, (byte)DataType.List_Vector2 },
-            { DataType.List_Color, (byte)DataType.List_Color },
-            { DataType.List_Quaternion, (byte)DataType.List_Quaternion },
-            { DataType.List_DateTime, (byte)DataType.List_DateTime },
-            { DataType.List_SaveableData, (byte)DataType.List_SaveableData },
-        };
-
-
-
-
         private static readonly Dictionary<Type, Func<object, byte[]>> SerializableConversionStrategies = new Dictionary<Type, Func<object, byte[]>>
         {
             { typeof(Vector3), data => Vector3ToBytes((Vector3)data) },
@@ -421,7 +390,7 @@ namespace SaveLoadSystem.Core
 
         public static byte DataTypeToByte(this DataType dataType)
         {
-            return DataTypeToByteDict[dataType];
+            return (byte)dataType;
         }
 
 

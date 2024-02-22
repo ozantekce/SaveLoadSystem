@@ -2,7 +2,7 @@
 namespace SaveLoadSystem.Core
 {
 
-    public enum DataType
+    public enum DataType : byte
     {
         // Basic Types
         Int = 0,

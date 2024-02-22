@@ -16,9 +16,9 @@ namespace SaveLoadSystem.Core
         /// <param name="saveableData">The data to be saved.</param>
         /// <param name="path">The directory path where the file will be saved.</param>
         /// <param name="fileName">The name of the file to save.</param>
-        /// <param name="encrypt">Optional flag to determine if the data should be encrypted. Default is false.</param>
+        /// <param name="encryptionType">Optional flag to determine if the data should be encrypted. Default is none.</param>
         /// <param name="encryptionKey">Optional encryption key used when encrypting the data.</param>
-        public void Save(SaveableData saveableData, string path, string fileName, bool encrypt = false, string encryptionKey = null)
+        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             // Append the custom file extension to the file name.
             fileName += FileExtension;
@@ -32,12 +32,12 @@ namespace SaveLoadSystem.Core
             // Convert the list of bytes to an array for file writing.
             byte[] serializedData = serializedList.ToArray();
             // Check if encryption is requested.
-            if (encrypt)
+            if (encryptionType != EncryptionType.None)
             {
                 // Encrypt the serialized data using the provided encryption key.
-                serializedData = encryptionKey.EncryptBytes(serializedData);
+                serializedData = EncryptionHelper.Encrypt(serializedData, encryptionType, encryptionKey);
             }
-            // Write the serialized (and possibly encrypted) data to the file.
+            // Write the serialized data to the file.
             File.WriteAllBytes(path, serializedData);
         }
 
@@ -46,10 +46,10 @@ namespace SaveLoadSystem.Core
         /// </summary>
         /// <param name="path">The directory path where the file is located.</param>
         /// <param name="fileName">The name of the file to load.</param>
-        /// <param name="decrypt">Optional flag to determine if the data should be decrypted. Default is false.</param>
-        /// <param name="decryptionKey">Optional decryption key used when decrypting the data.</param>
+        /// <param name="encryptionType">Optional flag to determine if the data should be decrypted. Default is none.</param>
+        /// <param name="encryptionKey">Optional decryption key used when decrypting the data.</param>
         /// <returns>A SaveableData object containing the loaded data, or null if the file does not exist or the load fails.</returns>
-        public SaveableData Load(string path, string fileName, bool decrypt = false, string decryptionKey = null)
+        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             // Append the custom file extension to the file name.
             fileName += FileExtension;
@@ -69,10 +69,10 @@ namespace SaveLoadSystem.Core
             byte[] serializedData = File.ReadAllBytes(path);
 
             // Check if decryption is requested.
-            if (decrypt)
+            if (encryptionType != EncryptionType.None)
             {
                 // Decrypt the serialized data using the provided decryption key.
-                serializedData = decryptionKey.DecryptBytes(serializedData);
+                serializedData = EncryptionHelper.Decrypt(serializedData, encryptionType, encryptionKey);
             }
             // Initialize an offset variable for tracking the read position in the byte array.
             int offset = 0;
@@ -200,7 +200,7 @@ namespace SaveLoadSystem.Core
 
                     for (int i = 0; i < stringList.Count; i++)
                     {
-                        var strBytes = System.Text.Encoding.UTF8.GetBytes(stringList[i]);
+                        byte[] strBytes = System.Text.Encoding.UTF8.GetBytes(stringList[i]);
                         refSerializedData.AddRange(stringList[i].Length.IntToBytes(true));
                         refSerializedData.AddRange(strBytes);
                     }

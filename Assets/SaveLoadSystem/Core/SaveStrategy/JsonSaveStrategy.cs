@@ -1,11 +1,10 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using static SaveLoadSystem.Core.DataWrapper;
 using System.Linq;
+using UnityEngine;
 
 
 namespace SaveLoadSystem.Core
@@ -15,20 +14,20 @@ namespace SaveLoadSystem.Core
     {
         public string FileExtension => ".json";
 
-        public void Save(SaveableData saveabledata, string path, string fileName, bool encrypt = false, string encryptionKey = null)
+        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-            string jsonData = JsonConvert.SerializeObject(saveabledata);
-            if (encrypt)
+            string jsonData = JsonConvert.SerializeObject(saveableData);
+            if(encryptionType != EncryptionType.None)
             {
-                jsonData = encryptionKey.EncryptString(jsonData);
+                jsonData = EncryptionHelper.Encrypt(jsonData, encryptionType, encryptionKey);
             }
-
+            
             File.WriteAllText(path, jsonData);
         }
 
-        public SaveableData Load(string path, string fileName, bool decrypt = false, string decryptionKey = null)
+        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
@@ -40,9 +39,9 @@ namespace SaveLoadSystem.Core
             }
 
             string jsonData = File.ReadAllText(path);
-            if (decrypt)
+            if (encryptionType != EncryptionType.None)
             {
-                jsonData = decryptionKey.DecryptString(jsonData);
+                jsonData = EncryptionHelper.Decrypt(jsonData, encryptionType, encryptionKey);
             }
 
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -139,15 +138,10 @@ namespace SaveLoadSystem.Core
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            // Serialize the SaveableData object here
-            SaveableData saveableData = (SaveableData)value;
-
-            // Use serializer.Serialize to write the JSON for the object, if needed.
-            // This is where you would handle the recursive structure manually if necessary.
-            throw new NotImplementedException();
+            throw new NotImplementedException("Unnecessary because CanWrite is false. The type will skip the converter.");
         }
 
-        public override bool CanWrite => true; // Set to true if you implement WriteJson
+        public override bool CanWrite => false;
     }
 
 

@@ -3,20 +3,16 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-
-
 namespace SaveLoadSystem.Core
 {
-
     internal class SerializeSaveStrategy : ISaveLoadStrategy
     {
         public string FileExtension => ".bin";
 
-        public void Save(SaveableData saveableData, string path, string fileName, bool encrypt = false, string encryptionKey = null)
+        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -24,22 +20,19 @@ namespace SaveLoadSystem.Core
                 formatter.Serialize(memoryStream, saveableData);
 
                 byte[] serializedData = memoryStream.ToArray();
-
-                if (encrypt)
-                {
-                    serializedData = encryptionKey.EncryptBytes(serializedData);
-                }
-
                 string serializedString = Convert.ToBase64String(serializedData);
+                if (encryptionType != EncryptionType.None)
+                {
+                    serializedString = EncryptionHelper.Encrypt(serializedString, encryptionType, encryptionKey);
+                }
                 File.WriteAllText(path, serializedString);
             }
         }
 
-        public SaveableData Load(string path, string fileName, bool decrypt = false, string decryptionKey = null)
+        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-            string serializedString = File.ReadAllText(path);
 
             if (!File.Exists(path))
             {
@@ -47,12 +40,14 @@ namespace SaveLoadSystem.Core
                 return null;
             }
 
+            string serializedString = File.ReadAllText(path);
+            if (encryptionType != EncryptionType.None)
+            {
+                serializedString = EncryptionHelper.Encrypt(serializedString, encryptionType, encryptionKey);
+            }
+
             byte[] serializedData = Convert.FromBase64String(serializedString);
 
-            if (decrypt)
-            {
-                serializedData = decryptionKey.DecryptBytes(serializedData);
-            }
 
             using (MemoryStream memoryStream = new MemoryStream(serializedData))
             {

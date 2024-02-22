@@ -1,10 +1,3 @@
-using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-
-
-
 namespace SaveLoadSystem.Core
 {
     internal interface ISaveLoadStrategy
@@ -12,15 +5,9 @@ namespace SaveLoadSystem.Core
 
         public string FileExtension { get; }
 
-        public void Save(SaveableData saveableData, string path, string fileName, bool encrypt = false, string encryptionKey = null);
+        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "");
 
-
-        public SaveableData Load(string path, string fileName, bool decrypt = false, string decryptionKey = null);
-
-
-
+        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "");
 
     }
-
-
 }
