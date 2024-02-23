@@ -331,8 +331,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveMode: 0
+  encryptionType: 1
   fileName: SaveSlot1
-  randomTestSize: 800000
+  randomTestSize: 50
 --- !u!4 &1435328343
 Transform:
   m_ObjectHideFlags: 0

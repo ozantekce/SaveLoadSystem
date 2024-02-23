@@ -18,7 +18,7 @@ namespace SaveLoadSystem.Core
         /// <param name="fileName">The name of the file to save.</param>
         /// <param name="encryptionType">Optional flag to determine if the data should be encrypted. Default is none.</param>
         /// <param name="encryptionKey">Optional encryption key used when encrypting the data.</param>
-        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public void Save(SaveableData saveableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             // Append the custom file extension to the file name.
             fileName += FileExtension;
@@ -28,7 +28,7 @@ namespace SaveLoadSystem.Core
             // Initialize a list to hold serialized data bytes.
             List<byte> serializedList = new List<byte>();
             // Serialize the saveable data into the list.
-            Serialize(saveableData, serializedList);
+            Serialize(saveableData, serializedList, runAsync);
             // Convert the list of bytes to an array for file writing.
             byte[] serializedData = serializedList.ToArray();
             // Check if encryption is requested.
@@ -49,7 +49,7 @@ namespace SaveLoadSystem.Core
         /// <param name="encryptionType">Optional flag to determine if the data should be decrypted. Default is none.</param>
         /// <param name="encryptionKey">Optional decryption key used when decrypting the data.</param>
         /// <returns>A SaveableData object containing the loaded data, or null if the file does not exist or the load fails.</returns>
-        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public SaveableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             // Append the custom file extension to the file name.
             fileName += FileExtension;
@@ -77,7 +77,7 @@ namespace SaveLoadSystem.Core
             // Initialize an offset variable for tracking the read position in the byte array.
             int offset = 0;
             // Deserialize the byte array back into a SaveableData object and return it.
-            return Deserialize(serializedData, ref offset);
+            return Deserialize(serializedData, ref offset, runAsync);
         }
 
 
@@ -88,13 +88,13 @@ namespace SaveLoadSystem.Core
         /// </summary>
         /// <param name="saveableData">The SaveableData object to be serialized.</param>
         /// <param name="serializedData">The list of bytes where the serialized data will be stored.</param>
-        private static void Serialize(SaveableData saveableData, List<byte> serializedData)
+        private static void Serialize(SaveableData saveableData, List<byte> serializedData, bool runAsync)
         {
             // Retrieve the dictionary of data fields from the saveableData object.
             Dictionary<string, DataWrapper> fields = saveableData.Fields;
 
             // Convert the count of fields into bytes and add to the serialized data list.
-            serializedData.AddRange(fields.Count.IntToBytes(true));
+            serializedData.AddRange(fields.Count.IntToBytes());
 
             // Iterate through each item in the fields dictionary.
             foreach (var item in fields)
@@ -102,12 +102,12 @@ namespace SaveLoadSystem.Core
                 // Convert the field name (key) into bytes using UTF8 encoding.
                 byte[] fieldNameBytes = System.Text.Encoding.UTF8.GetBytes(item.Key);
                 // Convert the length of the field name into bytes and add to the serialized data list.
-                serializedData.AddRange(fieldNameBytes.Length.IntToBytes(true));
+                serializedData.AddRange(fieldNameBytes.Length.IntToBytes());
                 // Add the field name bytes to the serialized data list.
                 serializedData.AddRange(fieldNameBytes);
                 // Serialize the field value (DataWrapper) and add the serialized bytes to the list.
                 // ConvertToByteAndAdd handles the conversion of various data types to bytes.
-                ConvertToByteAndAdd(item.Value, serializedData);
+                ConvertToByteAndAdd(item.Value, serializedData, runAsync);
             }
 
             // The method does not return a value as it directly modifies the provided serializedData list.
@@ -120,7 +120,7 @@ namespace SaveLoadSystem.Core
         /// </summary>
         /// <param name="data">The data to be converted into bytes.</param>
         /// <param name="refSerializedData">The referenced list of bytes where the converted data will be added.</param>
-        private static void ConvertToByteAndAdd(DataWrapper data, List<byte> refSerializedData)
+        private static void ConvertToByteAndAdd(DataWrapper data, List<byte> refSerializedData, bool runAsync)
         {
             // Switch statement to handle different data types.
             switch (data.Type)
@@ -128,27 +128,27 @@ namespace SaveLoadSystem.Core
                 case DataType.Int:
                     // Add the DataType byte and the integer value converted to bytes.
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(data.GetValue<int>().IntToBytes(true));
+                    refSerializedData.AddRange(data.GetValue<int>().IntToBytes());
                     return;
                 case DataType.String:
                     // Add the DataType byte for a string.
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     // Get the string value from the DataWrapper and convert the length of the string into bytes and add to the list.
-                    refSerializedData.AddRange(data.GetValue<string>().Length.IntToBytes(true));
+                    refSerializedData.AddRange(data.GetValue<string>().Length.IntToBytes());
                     // Convert the string into bytes (UTF8 encoding) and add to the list.
                     refSerializedData.AddRange(System.Text.Encoding.UTF8.GetBytes(data.GetValue<string>()));
                     return;
                 case DataType.Float:
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(data.GetValue<float>().FloatToBytes(true));
+                    refSerializedData.AddRange(data.GetValue<float>().FloatToBytes());
                     return;
                 case DataType.Long:
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(data.GetValue<long>().LongToBytes(true));
+                    refSerializedData.AddRange(data.GetValue<long>().LongToBytes());
                     return;
                 case DataType.Double:
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(data.GetValue<double>().DoubleToBytes(true));
+                    refSerializedData.AddRange(data.GetValue<double>().DoubleToBytes());
                     return;
                 case DataType.Bool:
                     refSerializedData.Add(data.Type.DataTypeToByte());
@@ -178,58 +178,58 @@ namespace SaveLoadSystem.Core
                     // Add the DataType byte for SaveableData.
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     // Serialize the SaveableData object and add the serialized bytes to the list.
-                    Serialize(data.GetValue<SaveableData>(), refSerializedData);
+                    Serialize(data.GetValue<SaveableData>(), refSerializedData, runAsync);
                     return;
                 case DataType.List_Int:
                     List<int> intList = data.GetValue<List<int>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(intList.Count.IntToBytes(true));
-                    intList.ForEach(i => refSerializedData.AddRange(i.IntToBytes(true)));
+                    refSerializedData.AddRange(intList.Count.IntToBytes());
+                    intList.ForEach(i => refSerializedData.AddRange(i.IntToBytes()));
                     return;
                 case DataType.List_Float:
                     List<float> floatList = data.GetValue<List<float>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(floatList.Count.IntToBytes(true));
-                    floatList.ForEach(f => refSerializedData.AddRange(f.FloatToBytes(true)));
+                    refSerializedData.AddRange(floatList.Count.IntToBytes());
+                    floatList.ForEach(f => refSerializedData.AddRange(f.FloatToBytes()));
                     return;
 
                 case DataType.List_String:
                     List<string> stringList = data.GetValue<List<string>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(stringList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(stringList.Count.IntToBytes());
 
                     for (int i = 0; i < stringList.Count; i++)
                     {
                         byte[] strBytes = System.Text.Encoding.UTF8.GetBytes(stringList[i]);
-                        refSerializedData.AddRange(stringList[i].Length.IntToBytes(true));
+                        refSerializedData.AddRange(stringList[i].Length.IntToBytes());
                         refSerializedData.AddRange(strBytes);
                     }
                     return;
                 case DataType.List_Long:
                     List<long> longList = data.GetValue<List<long>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(longList.Count.IntToBytes(true));
-                    longList.ForEach(l => refSerializedData.AddRange(l.LongToBytes(true)));
+                    refSerializedData.AddRange(longList.Count.IntToBytes());
+                    longList.ForEach(l => refSerializedData.AddRange(l.LongToBytes()));
                     return;
 
                 case DataType.List_Double:
                     List<double> doubleList = data.GetValue<List<double>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(doubleList.Count.IntToBytes(true));
-                    doubleList.ForEach(d => refSerializedData.AddRange(d.DoubleToBytes(true)));
+                    refSerializedData.AddRange(doubleList.Count.IntToBytes());
+                    doubleList.ForEach(d => refSerializedData.AddRange(d.DoubleToBytes()));
                     return;
 
                 case DataType.List_Bool:
                     List<bool> boolList = data.GetValue<List<bool>>();
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(boolList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(boolList.Count.IntToBytes());
                     boolList.ForEach(b => refSerializedData.Add(Convert.ToByte(b)));
                     return;
 
                 case DataType.List_Vector3:
                     List<byte[]> vector3List = data.BytesList;
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(vector3List.Count.IntToBytes(true));
+                    refSerializedData.AddRange(vector3List.Count.IntToBytes());
                     vector3List.ForEach(v => {
                         refSerializedData.AddRange(v);
                     });
@@ -238,7 +238,7 @@ namespace SaveLoadSystem.Core
                 case DataType.List_Vector2:
                     List<byte[]> vector2List = data.BytesList;
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(vector2List.Count.IntToBytes(true));
+                    refSerializedData.AddRange(vector2List.Count.IntToBytes());
                     vector2List.ForEach(v => {
                         refSerializedData.AddRange(v);
                     });
@@ -247,7 +247,7 @@ namespace SaveLoadSystem.Core
                 case DataType.List_Color:
                     List<byte[]> colorList = data.BytesList;
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(colorList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(colorList.Count.IntToBytes());
                     colorList.ForEach(c => {
                         refSerializedData.AddRange(c);
                     });
@@ -256,7 +256,7 @@ namespace SaveLoadSystem.Core
                 case DataType.List_Quaternion:
                     List<byte[]> quaternionList = data.BytesList;
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(quaternionList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(quaternionList.Count.IntToBytes());
                     quaternionList.ForEach(q => {
                         refSerializedData.AddRange(q);
                     });
@@ -265,7 +265,7 @@ namespace SaveLoadSystem.Core
                 case DataType.List_DateTime:
                     List<byte[]> dateTimeList = data.BytesList;
                     refSerializedData.Add(data.Type.DataTypeToByte());
-                    refSerializedData.AddRange(dateTimeList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(dateTimeList.Count.IntToBytes());
                     dateTimeList.ForEach(dt => {
                         refSerializedData.AddRange(dt);
                     });
@@ -277,11 +277,11 @@ namespace SaveLoadSystem.Core
                     // Add the DataType byte for a list of SaveableData objects.
                     refSerializedData.Add(data.Type.DataTypeToByte());
                     // Convert the count of SaveableData objects in the list into bytes and add to the list.
-                    refSerializedData.AddRange(saveableDataList.Count.IntToBytes(true));
+                    refSerializedData.AddRange(saveableDataList.Count.IntToBytes());
                     // Serialize each SaveableData object in the list and add the bytes to the list.
                     for (int i = 0; i < saveableDataList.Count; i++)
                     {
-                        Serialize(saveableDataList[i], refSerializedData);
+                        Serialize(saveableDataList[i], refSerializedData, runAsync);
                     }
                     return;
 
@@ -297,7 +297,7 @@ namespace SaveLoadSystem.Core
         /// <param name="data">The byte array to be deserialized.</param>
         /// <param name="offset">The reference to the current position in the byte array.</param>
         /// <returns>A SaveableData object reconstructed from the byte array.</returns>
-        private static SaveableData Deserialize(byte[] data, ref int offset)
+        private static SaveableData Deserialize(byte[] data, ref int offset, bool runAsync)
         {
             // Create a new SaveableData object to store the deserialized data.
             SaveableData saveableData = new SaveableData();
@@ -364,7 +364,7 @@ namespace SaveLoadSystem.Core
                         fieldValue = data.GetDateTimeBytes(ref offset);
                         break;
                     case DataType.SaveableData:
-                        fieldValue = Deserialize(data, ref offset);
+                        fieldValue = Deserialize(data, ref offset, runAsync);
                         break;
                     case DataType.List_Int:
                         var intList = new List<int>();
@@ -433,7 +433,7 @@ namespace SaveLoadSystem.Core
                         listCount = data.BytesToInt(ref offset);
                         for (int j = 0; j < listCount; j++)
                         {
-                            var saveableDataTemp = Deserialize(data, ref offset);
+                            var saveableDataTemp = Deserialize(data, ref offset, runAsync);
                             saveableDataList.Add(saveableDataTemp);
                         }
                         fieldValue = saveableDataList;

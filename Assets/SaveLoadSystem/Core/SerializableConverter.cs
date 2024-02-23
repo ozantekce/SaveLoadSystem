@@ -29,10 +29,6 @@ namespace SaveLoadSystem.Core
 
 
 
-        private static byte[] IntBytesCache = new byte[4];
-        private static byte[] LongBytesCache = new byte[8];
-
-
         public static byte[] ConvertToBytes<T>(this T data)
         {
             if (SerializableConversionStrategies.TryGetValue(typeof(T), out var converter))
@@ -75,28 +71,9 @@ namespace SaveLoadSystem.Core
         }
 
 
-        public static byte[] IntToBytes(this int value, bool useCache = true)
+        public static byte[] IntToBytes(this int value)
         {
-            if(!useCache) return BitConverter.GetBytes(value);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                // Little-endian: least significant byte first
-                IntBytesCache[0] = (byte)value;
-                IntBytesCache[1] = (byte)(value >> 8);
-                IntBytesCache[2] = (byte)(value >> 16);
-                IntBytesCache[3] = (byte)(value >> 24);
-            }
-            else
-            {
-                // Big-endian: most significant byte first
-                IntBytesCache[0] = (byte)(value >> 24);
-                IntBytesCache[1] = (byte)(value >> 16);
-                IntBytesCache[2] = (byte)(value >> 8);
-                IntBytesCache[3] = (byte)value;
-            }
-
-            return IntBytesCache;
+            return BitConverter.GetBytes(value);
         }
 
         public static int BytesToInt(this byte[] value, int offset = 0)
@@ -104,12 +81,9 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToInt32(value, offset);
         }
 
-        public static byte[] FloatToBytes(this float value, bool useCache = true)
+        public static byte[] FloatToBytes(this float value)
         {
-            if(!useCache) return BitConverter.GetBytes(value);
-
-            int intValue = BitConverter.SingleToInt32Bits(value);
-            return intValue.IntToBytes(true);
+            return BitConverter.GetBytes(value);
         }
 
         public static float BytesToFloat(this byte[] value, int offset = 0)
@@ -117,27 +91,9 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToSingle(value, offset);
         }
 
-        public static byte[] LongToBytes(this long value, bool useCache = true)
+        public static byte[] LongToBytes(this long value)
         {
-            if(!useCache) return BitConverter.GetBytes(value);
-
-
-            if (BitConverter.IsLittleEndian)
-            {
-                for (int i = 0; i < LongBytesCache.Length; i++)
-                {
-                    LongBytesCache[i] = (byte)(value >> (8 * i));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < LongBytesCache.Length; i++)
-                {
-                    LongBytesCache[7 - i] = (byte)(value >> (8 * i));
-                }
-            }
-
-            return LongBytesCache;
+            return BitConverter.GetBytes(value);
         }
 
         public static long BytesToLong(this byte[] value, int offset = 0)
@@ -145,14 +101,9 @@ namespace SaveLoadSystem.Core
             return BitConverter.ToInt64(value, offset);
         }
 
-        public static byte[] DoubleToBytes(this double value, bool useCache = true)
+        public static byte[] DoubleToBytes(this double value)
         {
-            if(!useCache) return BitConverter.GetBytes(value);
-
-            // Convert double to long representation
-            long longValue = BitConverter.DoubleToInt64Bits(value);
-            return longValue.LongToBytes(true); // Reuse the LongToBytes method
-
+            return BitConverter.GetBytes(value);
         }
 
         public static double BytesToDouble(this byte[] value, int offset = 0)
@@ -174,9 +125,9 @@ namespace SaveLoadSystem.Core
         {
             byte[] bytes = new byte[12]; // 3 floats * 4 bytes per float
 
-            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
-            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
-            Array.Copy(value.z.FloatToBytes(true), 0, bytes, 8, 4);
+            Array.Copy(value.x.FloatToBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(), 0, bytes, 4, 4);
+            Array.Copy(value.z.FloatToBytes(), 0, bytes, 8, 4);
 
             return bytes;
         }
@@ -193,8 +144,8 @@ namespace SaveLoadSystem.Core
         {
             byte[] bytes = new byte[8]; // 2 floats * 4 bytes per float
 
-            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
-            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
+            Array.Copy(value.x.FloatToBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(), 0, bytes, 4, 4);
 
             return bytes;
         }
@@ -211,10 +162,10 @@ namespace SaveLoadSystem.Core
         {
             byte[] bytes = new byte[16]; // 4 floats * 4 bytes per float
 
-            Array.Copy(value.r.FloatToBytes(true), 0, bytes, 0, 4);
-            Array.Copy(value.g.FloatToBytes(true), 0, bytes, 4, 4);
-            Array.Copy(value.b.FloatToBytes(true), 0, bytes, 8, 4);
-            Array.Copy(value.a.FloatToBytes(true), 0, bytes, 12, 4);
+            Array.Copy(value.r.FloatToBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.g.FloatToBytes(), 0, bytes, 4, 4);
+            Array.Copy(value.b.FloatToBytes(), 0, bytes, 8, 4);
+            Array.Copy(value.a.FloatToBytes(), 0, bytes, 12, 4);
 
             return bytes;
         }
@@ -232,10 +183,10 @@ namespace SaveLoadSystem.Core
         {
             byte[] bytes = new byte[16]; // 4 floats * 4 bytes per float
 
-            Array.Copy(value.x.FloatToBytes(true), 0, bytes, 0, 4);
-            Array.Copy(value.y.FloatToBytes(true), 0, bytes, 4, 4);
-            Array.Copy(value.z.FloatToBytes(true), 0, bytes, 8, 4);
-            Array.Copy(value.w.FloatToBytes(true), 0, bytes, 12, 4);
+            Array.Copy(value.x.FloatToBytes(), 0, bytes, 0, 4);
+            Array.Copy(value.y.FloatToBytes(), 0, bytes, 4, 4);
+            Array.Copy(value.z.FloatToBytes(), 0, bytes, 8, 4);
+            Array.Copy(value.w.FloatToBytes(), 0, bytes, 12, 4);
 
             return bytes;
         }

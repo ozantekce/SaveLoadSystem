@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using SaveLoadSystem;
 using SaveLoadSystem.Core;
 using System;
 using System.Collections;
@@ -13,6 +11,7 @@ public class Test : MonoBehaviour
 {
 
     public SaveMode saveMode;
+    public EncryptionType encryptionType;
     public string fileName = "SaveSlot1";
     public int randomTestSize = 100;
 
@@ -292,7 +291,7 @@ public class Test : MonoBehaviour
         // Custom Serialization
         stopwatch.Start();
         startTime = DateTime.Now;
-        SaveLoadManager.Save(root, fileName, SaveMode.CustomSerialize);
+        SaveLoadManager.Save(root, fileName, SaveMode.CustomSerialize, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -300,7 +299,7 @@ public class Test : MonoBehaviour
         
         stopwatch.Restart();
         startTime = DateTime.Now;
-        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.CustomSerialize);
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.CustomSerialize, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -310,11 +309,11 @@ public class Test : MonoBehaviour
         Debug.Log($"Custom Serialization test result: {testResult}");
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
-        /*
+        
         // Binary Serialization
         stopwatch.Restart();
         startTime = DateTime.Now;
-        SaveLoadManager.Save(root, fileName, SaveMode.Serialize);
+        SaveLoadManager.Save(root, fileName, SaveMode.Serialize, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -322,7 +321,7 @@ public class Test : MonoBehaviour
 
         stopwatch.Restart();
         startTime = DateTime.Now;
-        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Serialize);
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Serialize, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -337,7 +336,7 @@ public class Test : MonoBehaviour
         // JSON Serialization
         stopwatch.Restart();
         startTime = DateTime.Now;
-        SaveLoadManager.Save(root, fileName, SaveMode.Json);
+        SaveLoadManager.Save(root, fileName, SaveMode.Json, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -345,7 +344,7 @@ public class Test : MonoBehaviour
 
         stopwatch.Restart();
         startTime = DateTime.Now;
-        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Json);
+        deserializedSaveData = SaveLoadManager.Load(fileName, SaveMode.Json, encryptionType);
         endTime = DateTime.Now;
         duration = endTime - startTime;
         stopwatch.Stop();
@@ -355,9 +354,129 @@ public class Test : MonoBehaviour
         Debug.Log($"JSON test result: {testResult}");
         //-------------------------------------------------------------------------
         Debug.Log("^#################################################################");
-        */
+        
 
     }
+
+    [ContextMenu("RandomTestAsyncMultiple")]
+    public void RandomTestAsyncMultiple()
+    {
+
+        int totalCreated = 0;
+        SaveableData root = CreateRandomSaveableData(randomTestSize, ref totalCreated);
+
+        Debug.Log("total test data size : " + totalCreated);
+        for (int i = 0; i < 100; i++)
+        {
+            RandomTestAsync($"SaveSlot{i}", root);
+        }
+
+    }
+
+
+    public void RandomTestAsync(string fileName, SaveableData root)
+    {
+
+
+        Stopwatch[] stopwatchs = new Stopwatch[6];
+        DateTime[] startTimes = new DateTime[6];
+        DateTime[] endTimes = new DateTime[6];
+        TimeSpan[] durations = new TimeSpan[6];
+
+        //-------------------------------------------------------------------------
+        // Custom Serialization
+        stopwatchs[0] = new Stopwatch();
+        stopwatchs[0].Start();
+        startTimes[0] = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.CustomSerialize, encryptionType, true, () =>
+        {
+            endTimes[0] = DateTime.Now;
+            durations[0] = endTimes[0] - startTimes[0];
+            stopwatchs[0].Stop();
+            Debug.Log($"Custom Serialization Saving takes: {stopwatchs[0].ElapsedMilliseconds} ms (Stopwatch) | {durations[0].TotalMilliseconds} ms (DateTime)");
+        });
+
+        stopwatchs[1] = new Stopwatch();
+        stopwatchs[1].Start();
+        startTimes[1] = DateTime.Now;
+        SaveLoadManager.Load(fileName, SaveMode.CustomSerialize, encryptionType, true, deserializedSaveData =>
+        {
+            endTimes[1] = DateTime.Now;
+            durations[1] = endTimes[1] - startTimes[1];
+            stopwatchs[1].Stop();
+            Debug.Log($"Custom Serialization Loading takes: {stopwatchs[1].ElapsedMilliseconds}  ms (Stopwatch) |  {durations[1].TotalMilliseconds} ms (DateTime)");
+
+            bool testResult = IsSame(root, deserializedSaveData);
+            Debug.Log($"Custom Serialization test result: {testResult}");
+        });
+
+        /*
+
+        //-------------------------------------------------------------------------
+        // Binary Serialization
+        stopwatchs[2] = new Stopwatch();
+        stopwatchs[2].Start();
+        startTimes[2] = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.Serialize, encryptionType, true, () =>
+        {
+            endTimes[2] = DateTime.Now;
+            durations[2] = endTimes[2] - startTimes[2];
+            stopwatchs[2].Stop();
+            Debug.Log($"Binary Serialization Saving takes: {stopwatchs[2].ElapsedMilliseconds}   ms (Stopwatch) |   {durations[2].TotalMilliseconds} ms (DateTime)");
+
+        });
+
+        stopwatchs[3] = new Stopwatch();
+        stopwatchs[3].Start();
+        startTimes[3] = DateTime.Now;
+        SaveLoadManager.Load(fileName, SaveMode.Serialize, encryptionType, true, deserializedSaveData =>
+        {
+            endTimes[3] = DateTime.Now;
+            durations[3] = endTimes[3] - startTimes[3];
+            stopwatchs[3].Stop();
+            Debug.Log($"Binary Serialization Loading takes: {stopwatchs[3].ElapsedMilliseconds} ms (Stopwatch) | {durations[3].TotalMilliseconds} ms (DateTime)");
+
+            bool testResult = IsSame(root, deserializedSaveData);
+            Debug.Log($"Binary Serialization test result: {testResult}");
+        });
+
+        */
+
+
+        /*
+        //-------------------------------------------------------------------------
+        // Json Serialization
+        stopwatchs[4] = new Stopwatch();
+        stopwatchs[4].Start();
+        startTimes[4] = DateTime.Now;
+        SaveLoadManager.Save(root, fileName, SaveMode.Json, encryptionType, true, () =>
+        {
+            endTimes[4] = DateTime.Now;
+            durations[4] = endTimes[4] - startTimes[4];
+            stopwatchs[4].Stop();
+            Debug.Log($"Json Serialization Saving takes: {stopwatchs[4].ElapsedMilliseconds}   ms (Stopwatch) |   {durations[4].TotalMilliseconds} ms (DateTime)");
+
+        });
+
+        stopwatchs[5] = new Stopwatch();
+        stopwatchs[5].Start();
+        startTimes[5] = DateTime.Now;
+        SaveLoadManager.Load(fileName, SaveMode.Json, encryptionType, true, deserializedSaveData =>
+        {
+            endTimes[5] = DateTime.Now;
+            durations[5] = endTimes[5] - startTimes[5];
+            stopwatchs[5].Stop();
+            Debug.Log($"Json Serialization Loading takes: {stopwatchs[5].ElapsedMilliseconds} ms (Stopwatch) | {durations[5].TotalMilliseconds} ms (DateTime)");
+
+            bool testResult = IsSame(root, deserializedSaveData);
+            Debug.Log($"Json Serialization test result: {testResult}");
+        });
+        */
+
+
+    }
+
+
 
 
     private SaveableData CreateRandomSaveableData(int minCount, ref int totalCreated)

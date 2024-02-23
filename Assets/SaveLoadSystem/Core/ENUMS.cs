@@ -10,7 +10,16 @@ public enum SaveMode
 public enum EncryptionType
 {
     None = 0,
-    CaesarCipher = 1,
-    XOR = 2,
-    AES = 3,
+    XOR = 1,
+    AES = 2,
+    CaesarCipher = 3,
+    
+}
+
+
+public enum OperationStatus
+{
+    NotStarted,
+    InProgress,
+    Completed
 }

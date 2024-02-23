@@ -14,7 +14,7 @@ namespace SaveLoadSystem.Core
     {
         public string FileExtension => ".json";
 
-        public void Save(SaveableData saveableData, string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public void Save(SaveableData saveableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
@@ -27,7 +27,7 @@ namespace SaveLoadSystem.Core
             File.WriteAllText(path, jsonData);
         }
 
-        public SaveableData Load(string path, string fileName, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public SaveableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);

@@ -6,9 +6,9 @@ namespace SaveLoadSystem.Core
 
         private static Dictionary<EncryptionType, BaseEncrypter> Encrypters = new Dictionary<EncryptionType, BaseEncrypter>()
         {
-            {EncryptionType.CaesarCipher, new CaesarCipherEncrypter()},
             {EncryptionType.XOR, new XOREncrypter() },
             {EncryptionType.AES, new AESEncrypter() },
+            {EncryptionType.CaesarCipher, new CaesarCipherEncrypter()},
         };
 
 
