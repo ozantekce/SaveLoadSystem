@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace SaveLoadSystem.Core
 {
-
     [JsonObject]
     [System.Serializable]
     public class SaveableData
@@ -114,7 +112,5 @@ namespace SaveLoadSystem.Core
         }
 
     }
-
-
 
 }
