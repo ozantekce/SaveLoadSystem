@@ -9,7 +9,7 @@ namespace SaveLoadSystem.Core
     {
         public string FileExtension => ".bin";
 
-        public void Save(SaveableData saveableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public void Save(SavableData savableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
@@ -17,7 +17,7 @@ namespace SaveLoadSystem.Core
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 IFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(memoryStream, saveableData);
+                formatter.Serialize(memoryStream, savableData);
 
                 byte[] serializedData = memoryStream.ToArray();
                 string serializedString = Convert.ToBase64String(serializedData);
@@ -29,7 +29,7 @@ namespace SaveLoadSystem.Core
             }
         }
 
-        public SaveableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public SavableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
@@ -52,7 +52,7 @@ namespace SaveLoadSystem.Core
             using (MemoryStream memoryStream = new MemoryStream(serializedData))
             {
                 IFormatter formatter = new BinaryFormatter();
-                return (SaveableData)formatter.Deserialize(memoryStream);
+                return (SavableData)formatter.Deserialize(memoryStream);
             }
         }
 

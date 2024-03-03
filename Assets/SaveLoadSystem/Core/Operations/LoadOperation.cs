@@ -11,9 +11,9 @@ namespace SaveLoadSystem.Core
         public SaveMode SaveStrategy { get; set; }
         public EncryptionType EncryptionType { get; set; }
         public string EncryptionKey { get; set; }
-        public Action<SaveableData> Callback { get; set; }
+        public Action<SavableData> Callback { get; set; }
 
-        public SaveableData Result { get; set; }
+        public SavableData Result { get; set; }
 
         public string ID => $"{Path}_{FileName}_{SaveStrategy}";
 

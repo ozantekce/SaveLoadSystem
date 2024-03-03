@@ -15,7 +15,7 @@ namespace SaveLoadSystem.Core
             Save(data, null, fileName, saveStrategy, encryptionType, runAsync, callback);
         }
 
-        public static SaveableData Load(string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, EncryptionType encryptionType = EncryptionType.None, bool runAsync = false, Action<SaveableData> callback = null)
+        public static SavableData Load(string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, EncryptionType encryptionType = EncryptionType.None, bool runAsync = false, Action<SavableData> callback = null)
         {
             return Load(null, fileName, saveStrategy, encryptionType, runAsync, callback);
         }
@@ -47,7 +47,7 @@ namespace SaveLoadSystem.Core
             }
         }
 
-        public static SaveableData Load(string path, string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, EncryptionType encryptionType = EncryptionType.None, bool runAsync = false, Action<SaveableData> callback = null)
+        public static SavableData Load(string path, string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, EncryptionType encryptionType = EncryptionType.None, bool runAsync = false, Action<SavableData> callback = null)
         {
             string finalPath = string.IsNullOrEmpty(path) ? Application.persistentDataPath : path;
             LoadOperation loadOperation = new LoadOperation

@@ -1,19 +1,19 @@
 using SaveLoadSystem.Core;
 using UnityEngine;
 
-public class SubGameObjectMono : MonoBehaviour, ISaveable
+public class SubGameObjectMono : MonoBehaviour, ISavable
 {
 
     public int value;
 
-    public SaveableData ConvertToSaveableData()
+    public SavableData ConvertToSavableData()
     {
-        SaveableData saveableData = new SaveableData();
-        saveableData.Write(nameof(value), value);
-        return saveableData;
+        SavableData savableData = new SavableData();
+        savableData.Write(nameof(value), value);
+        return savableData;
     }
 
-    public void LoadSavedData(SaveableData data)
+    public void LoadSavedData(SavableData data)
     {
         value = data.ReadOrDefault(nameof(value), value);
     }

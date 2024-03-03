@@ -7,11 +7,11 @@ namespace SaveLoadSystem.Core
     public static class Factory
     {
 
-        private static Dictionary<Type, Func<SaveableData, ISaveable>> ConvertingStrategies = new Dictionary<Type, Func<SaveableData, ISaveable>>();
+        private static Dictionary<Type, Func<SavableData, ISavable>> ConvertingStrategies = new Dictionary<Type, Func<SavableData, ISavable>>();
 
 
 
-        public static T Create<T>(this SaveableData data) where T : ISaveable
+        public static T Create<T>(this SavableData data) where T : ISavable
         {
             if (data == null) return default;
             if (!ConvertingStrategies.ContainsKey(data.GetType())) return default;
@@ -20,7 +20,7 @@ namespace SaveLoadSystem.Core
         }
 
 
-        public static void AddConvertingStrategy(Type type, Func<SaveableData, ISaveable> strategy)
+        public static void AddConvertingStrategy(Type type, Func<SavableData, ISavable> strategy)
         {
             ConvertingStrategies[type] = strategy;
         }

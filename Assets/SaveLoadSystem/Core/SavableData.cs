@@ -7,18 +7,18 @@ namespace SaveLoadSystem.Core
 {
     [JsonObject]
     [System.Serializable]
-    public class SaveableData
+    public class SavableData
     {
 
         [JsonProperty] private Dictionary<string, DataWrapper> fields;
         [JsonIgnore] public Dictionary<string, DataWrapper> Fields { get => fields; }
 
-        public SaveableData()
+        public SavableData()
         {
             fields = new Dictionary<string, DataWrapper>();
         }
 
-        internal SaveableData(Dictionary<string, DataWrapper> fieldToData)
+        internal SavableData(Dictionary<string, DataWrapper> fieldToData)
         {
             fields = fieldToData;
         }

@@ -14,11 +14,11 @@ namespace SaveLoadSystem.Core
     {
         public string FileExtension => ".json";
 
-        public void Save(SaveableData saveableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public void Save(SavableData savableData, string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
-            string jsonData = JsonConvert.SerializeObject(saveableData);
+            string jsonData = JsonConvert.SerializeObject(savableData);
             if(encryptionType != EncryptionType.None)
             {
                 jsonData = EncryptionHelper.Encrypt(jsonData, encryptionType, encryptionKey);
@@ -27,7 +27,7 @@ namespace SaveLoadSystem.Core
             File.WriteAllText(path, jsonData);
         }
 
-        public SaveableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
+        public SavableData Load(string path, string fileName, bool runAsync = false, EncryptionType encryptionType = EncryptionType.None, string encryptionKey = "")
         {
             fileName += FileExtension;
             path = Path.Combine(path, fileName);
@@ -46,10 +46,10 @@ namespace SaveLoadSystem.Core
 
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new DataWrapperConverter(), new SaveableDataConverter() },
+                Converters = new List<JsonConverter> { new DataWrapperConverter(), new SavableDataConverter() },
             };
 
-            return JsonConvert.DeserializeObject<SaveableData>(jsonData, settings);
+            return JsonConvert.DeserializeObject<SavableData>(jsonData, settings);
         }
 
 
@@ -85,7 +85,7 @@ namespace SaveLoadSystem.Core
                 DataType.Color => new DataWrapper(data.ToObject<byte[]>(), DataType.Color),
                 DataType.Quaternion => new DataWrapper(data.ToObject<byte[]>(), DataType.Quaternion),
                 DataType.DateTime => new DataWrapper(data.ToObject<byte[]>(), DataType.DateTime),
-                DataType.SaveableData => new DataWrapper(new SaveableData(data["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer)), DataType.SaveableData),
+                DataType.SavableData => new DataWrapper(new SavableData(data["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer)), DataType.SavableData),
                 // Lists
                 DataType.List_Int => new DataWrapper(data.ToObject<List<int>>(serializer), DataType.List_Int),
                 DataType.List_Float => new DataWrapper(data.ToObject<List<float>>(serializer), DataType.List_Float),
@@ -98,10 +98,10 @@ namespace SaveLoadSystem.Core
                 DataType.List_Color => new DataWrapper(data.ToObject<List<byte[]>>(serializer), DataType.List_Color),
                 DataType.List_Quaternion => new DataWrapper(data.ToObject<List<byte[]>>(serializer), DataType.List_Quaternion),
                 DataType.List_DateTime => new DataWrapper(data.ToObject<List<byte[]>>(serializer), DataType.List_DateTime),
-                DataType.List_SaveableData => new DataWrapper(
+                DataType.List_SavableData => new DataWrapper(
                     data.ToObject<List<JObject>>(serializer)
-                        .Select(jobj => new SaveableData(jobj["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer)))
-                        .ToList(), DataType.List_SaveableData),
+                        .Select(jobj => new SavableData(jobj["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer)))
+                        .ToList(), DataType.List_SavableData),
 
                 _ => throw new JsonSerializationException($"Unknown DataType: {dataType}")
             };
@@ -119,11 +119,11 @@ namespace SaveLoadSystem.Core
     }
 
 
-    internal class SaveableDataConverter : JsonConverter
+    internal class SavableDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(SaveableData);
+            return objectType == typeof(SavableData);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -133,7 +133,7 @@ namespace SaveLoadSystem.Core
             var fieldToData = jsonObject["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer);
 
 
-            return new SaveableData(fieldToData);
+            return new SavableData(fieldToData);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

@@ -21,7 +21,7 @@ public class Test : MonoBehaviour
     public void Save()
     {
 
-        SaveableData saveData = new SaveableData();
+        SavableData saveData = new SavableData();
 
         saveData.Write("longValue", 9999999L);
         saveData.Write("doubleValue", 9999999.88D);
@@ -44,7 +44,7 @@ public class Test : MonoBehaviour
     [ContextMenu("Load")]
     public void Load()
     {
-        SaveableData loadedData = SaveLoadManager.Load("SaveSlot1", saveMode);
+        SavableData loadedData = SaveLoadManager.Load("SaveSlot1", saveMode);
         Debug.Log(loadedData.Read<long>("longValue"));
         Debug.Log(loadedData.Read<double>("doubleValue"));
         Debug.Log(loadedData.Read<Color>("color"));
@@ -64,8 +64,8 @@ public class Test : MonoBehaviour
     [ContextMenu("Test")]
     void TestMethod()
     {
-        // Create a new SaveableData instance and write various types of data
-        SaveableData saveData = new SaveableData();
+        // Create a new SavableData instance and write various types of data
+        SavableData saveData = new SavableData();
 
         // Writing basic data types
         saveData.Write("longValue", 9999999L);
@@ -97,7 +97,7 @@ public class Test : MonoBehaviour
         SaveLoadManager.Save(saveData, fileName, saveMode);
 
 
-        SaveableData deserializedSaveData = SaveLoadManager.Load(fileName, saveMode);
+        SavableData deserializedSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Verify that deserialized data matches original data
         Debug.Assert(saveData.Read<long>("longValue") == deserializedSaveData.Read<long>("longValue"), "Long value mismatch");
@@ -126,65 +126,65 @@ public class Test : MonoBehaviour
 
 
     [ContextMenu("Test2")]
-    void TestComplexSaveableData()
+    void TestComplexSavableData()
     {
-        // Root SaveableData
-        SaveableData rootSaveData = new SaveableData();
+        // Root SavableData
+        SavableData rootSaveData = new SavableData();
         rootSaveData.Write("rootLong", 123456789L);
         rootSaveData.Write("rootString", "RootLevelData");
 
-        // Nested SaveableData
-        SaveableData nestedSaveData = new SaveableData();
+        // Nested SavableData
+        SavableData nestedSaveData = new SavableData();
         nestedSaveData.Write("nestedInt", 987);
         nestedSaveData.Write("nestedBool", true);
 
-        // Adding the nested SaveableData to the root
+        // Adding the nested SavableData to the root
         rootSaveData.Write("nestedData", nestedSaveData);
 
-        // Creating a list of SaveableData for complexity
-        List<SaveableData> listOfSaveableData = new List<SaveableData>();
+        // Creating a list of SavableData for complexity
+        List<SavableData> listOfSavableData = new List<SavableData>();
         for (int i = 0; i < 3; i++)
         {
-            SaveableData listSaveableData = new SaveableData();
-            listSaveableData.Write("index", i);
-            listSaveableData.Write("nestedString", $"Item{i}");
-            listOfSaveableData.Add(listSaveableData);
+            SavableData listSavableData = new SavableData();
+            listSavableData.Write("index", i);
+            listSavableData.Write("nestedString", $"Item{i}");
+            listOfSavableData.Add(listSavableData);
         }
 
-        // Writing the list of SaveableData to the root
-        rootSaveData.Write("listOfNestedData", listOfSaveableData);
+        // Writing the list of SavableData to the root
+        rootSaveData.Write("listOfNestedData", listOfSavableData);
 
-        // Sub-nested SaveableData for even more complexity
-        SaveableData subNestedSaveData = new SaveableData();
+        // Sub-nested SavableData for even more complexity
+        SavableData subNestedSaveData = new SavableData();
         subNestedSaveData.Write("subNestedFloat", 3.14f);
 
-        // Adding a sub-nested SaveableData to one of the list items
-        listOfSaveableData[1].Write("subNestedData", subNestedSaveData);
+        // Adding a sub-nested SavableData to one of the list items
+        listOfSavableData[1].Write("subNestedData", subNestedSaveData);
 
         SaveLoadManager.Save(rootSaveData, fileName, saveMode);
 
 
-        SaveableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
+        SavableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Verification: Check that the root level data matches
         Debug.Assert(rootSaveData.Read<long>("rootLong") == deserializedRootSaveData.Read<long>("rootLong"), "Root level long value mismatch");
         Debug.Assert(rootSaveData.Read<string>("rootString") == deserializedRootSaveData.Read<string>("rootString"), "Root level string value mismatch");
 
-        // Verification: Check that the nested SaveableData is correct
-        SaveableData deserializedNestedData = deserializedRootSaveData.Read<SaveableData>("nestedData");
+        // Verification: Check that the nested SavableData is correct
+        SavableData deserializedNestedData = deserializedRootSaveData.Read<SavableData>("nestedData");
         Debug.Assert(nestedSaveData.Read<int>("nestedInt") == deserializedNestedData.Read<int>("nestedInt"), "Nested int value mismatch");
         Debug.Assert(nestedSaveData.Read<bool>("nestedBool") == deserializedNestedData.Read<bool>("nestedBool"), "Nested bool value mismatch");
 
-        // Verification: Check that the list of SaveableData is correct
-        List<SaveableData> deserializedListOfSaveableData = deserializedRootSaveData.Read<List<SaveableData>>("listOfNestedData");
-        for (int i = 0; i < listOfSaveableData.Count; i++)
+        // Verification: Check that the list of SavableData is correct
+        List<SavableData> deserializedListOfSavableData = deserializedRootSaveData.Read<List<SavableData>>("listOfNestedData");
+        for (int i = 0; i < listOfSavableData.Count; i++)
         {
-            Debug.Assert(listOfSaveableData[i].Read<int>("index") == deserializedListOfSaveableData[i].Read<int>("index"), $"List item {i} index value mismatch");
-            Debug.Assert(listOfSaveableData[i].Read<string>("nestedString") == deserializedListOfSaveableData[i].Read<string>("nestedString"), $"List item {i} string value mismatch");
+            Debug.Assert(listOfSavableData[i].Read<int>("index") == deserializedListOfSavableData[i].Read<int>("index"), $"List item {i} index value mismatch");
+            Debug.Assert(listOfSavableData[i].Read<string>("nestedString") == deserializedListOfSavableData[i].Read<string>("nestedString"), $"List item {i} string value mismatch");
         }
 
-        // Verification: Check the sub-nested SaveableData
-        SaveableData deserializedSubNestedData = deserializedListOfSaveableData[1].Read<SaveableData>("subNestedData");
+        // Verification: Check the sub-nested SavableData
+        SavableData deserializedSubNestedData = deserializedListOfSavableData[1].Read<SavableData>("subNestedData");
         Debug.Assert(subNestedSaveData.Read<float>("subNestedFloat") == deserializedSubNestedData.Read<float>("subNestedFloat"), "Sub-nested float value mismatch");
 
         // Output result
@@ -193,24 +193,24 @@ public class Test : MonoBehaviour
 
 
     [ContextMenu("Test2")]
-    void TestComplex2SaveableData()
+    void TestComplex2SavableData()
     {
-        // Root SaveableData
-        SaveableData rootSaveData = new SaveableData();
-        SaveableData f0 = new SaveableData();
-        SaveableData f1 = new SaveableData();
-        SaveableData f0_0 = new SaveableData();
-        SaveableData f0_0_1 = new SaveableData();
-        SaveableData f1_0 = new SaveableData();
-        SaveableData f1_1 = new SaveableData();
-        SaveableData f1_2 = new SaveableData();
+        // Root SavableData
+        SavableData rootSaveData = new SavableData();
+        SavableData f0 = new SavableData();
+        SavableData f1 = new SavableData();
+        SavableData f0_0 = new SavableData();
+        SavableData f0_0_1 = new SavableData();
+        SavableData f1_0 = new SavableData();
+        SavableData f1_1 = new SavableData();
+        SavableData f1_2 = new SavableData();
 
-        List<SaveableData> list = new List<SaveableData>();
-        SaveableData listNode0 = new SaveableData();
-        SaveableData listNode1 = new SaveableData();
-        SaveableData listNode2 = new SaveableData();
+        List<SavableData> list = new List<SavableData>();
+        SavableData listNode0 = new SavableData();
+        SavableData listNode1 = new SavableData();
+        SavableData listNode2 = new SavableData();
 
-        SaveableData listNode1_0 = new SaveableData();
+        SavableData listNode1_0 = new SavableData();
 
         listNode1_0.Write("f0", 45);
 
@@ -244,25 +244,25 @@ public class Test : MonoBehaviour
         SaveLoadManager.Save(rootSaveData, fileName, saveMode);
 
 
-        SaveableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
+        SavableData deserializedRootSaveData = SaveLoadManager.Load(fileName, saveMode);
 
         // Begin testing assertions
-        Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<int>("f0") == 20, "Nested int value mismatch");
-        Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<SaveableData>("f1").Read<List<SaveableData>>("f0").Count == list.Count, "List<SaveableData> count mismatch");
+        Debug.Assert(deserializedRootSaveData.Read<SavableData>("f0").Read<SavableData>("f0").Read<int>("f0") == 20, "Nested int value mismatch");
+        Debug.Assert(deserializedRootSaveData.Read<SavableData>("f0").Read<SavableData>("f0").Read<SavableData>("f1").Read<List<SavableData>>("f0").Count == list.Count, "List<SavableData> count mismatch");
 
-        // Test the list of SaveableData
-        SaveableData deserializedListNode0 = deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<SaveableData>("f1").Read<List<SaveableData>>("f0")[0];
-        SaveableData deserializedListNode1 = deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<SaveableData>("f1").Read<List<SaveableData>>("f0")[1];
-        SaveableData deserializedListNode2 = deserializedRootSaveData.Read<SaveableData>("f0").Read<SaveableData>("f0").Read<SaveableData>("f1").Read<List<SaveableData>>("f0")[2];
+        // Test the list of SavableData
+        SavableData deserializedListNode0 = deserializedRootSaveData.Read<SavableData>("f0").Read<SavableData>("f0").Read<SavableData>("f1").Read<List<SavableData>>("f0")[0];
+        SavableData deserializedListNode1 = deserializedRootSaveData.Read<SavableData>("f0").Read<SavableData>("f0").Read<SavableData>("f1").Read<List<SavableData>>("f0")[1];
+        SavableData deserializedListNode2 = deserializedRootSaveData.Read<SavableData>("f0").Read<SavableData>("f0").Read<SavableData>("f1").Read<List<SavableData>>("f0")[2];
 
         Debug.Assert(deserializedListNode0.Read<int>("f0") == 10, "List node 0 value mismatch");
-        Debug.Assert(deserializedListNode1.Read<SaveableData>("f0").Read<int>("f0").Equals(listNode1_0.Read<int>("f0")), "List node 1 SaveableData mismatch");
+        Debug.Assert(deserializedListNode1.Read<SavableData>("f0").Read<int>("f0").Equals(listNode1_0.Read<int>("f0")), "List node 1 SavableData mismatch");
         Debug.Assert(deserializedListNode2.Read<int>("f0") == 25, "List node 2 value mismatch");
 
         // Test the direct children of root
-        Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f1").Read<SaveableData>("f0").Read<int>("f0") == 5, "Direct child f1_0 value mismatch");
-        Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f1").Read<SaveableData>("f1").Read<int>("f1") == 30, "Direct child f1_1 value mismatch");
-        Debug.Assert(deserializedRootSaveData.Read<SaveableData>("f1").Read<SaveableData>("f2").Read<string>("f2").Equals("Hi"), "Direct child f1_2 value mismatch");
+        Debug.Assert(deserializedRootSaveData.Read<SavableData>("f1").Read<SavableData>("f0").Read<int>("f0") == 5, "Direct child f1_0 value mismatch");
+        Debug.Assert(deserializedRootSaveData.Read<SavableData>("f1").Read<SavableData>("f1").Read<int>("f1") == 30, "Direct child f1_1 value mismatch");
+        Debug.Assert(deserializedRootSaveData.Read<SavableData>("f1").Read<SavableData>("f2").Read<string>("f2").Equals("Hi"), "Direct child f1_2 value mismatch");
 
         // Output result
         Debug.Log("All complex structure tests passed!");
@@ -277,11 +277,11 @@ public class Test : MonoBehaviour
     {
 
         int totalCreated = 0;
-        SaveableData root = CreateRandomSaveableData(randomTestSize, ref totalCreated);
+        SavableData root = CreateRandomSavableData(randomTestSize, ref totalCreated);
 
         Debug.Log("total test data size : " + totalCreated);
 
-        SaveableData deserializedSaveData;
+        SavableData deserializedSaveData;
         bool testResult;
         Stopwatch stopwatch = new Stopwatch();
         DateTime startTime, endTime;
@@ -363,7 +363,7 @@ public class Test : MonoBehaviour
     {
 
         int totalCreated = 0;
-        SaveableData root = CreateRandomSaveableData(randomTestSize, ref totalCreated);
+        SavableData root = CreateRandomSavableData(randomTestSize, ref totalCreated);
 
         Debug.Log("total test data size : " + totalCreated);
         for (int i = 0; i < 100; i++)
@@ -374,7 +374,7 @@ public class Test : MonoBehaviour
     }
 
 
-    public void RandomTestAsync(string fileName, SaveableData root)
+    public void RandomTestAsync(string fileName, SavableData root)
     {
 
 
@@ -479,7 +479,7 @@ public class Test : MonoBehaviour
 
 
 
-    private SaveableData CreateRandomSaveableData(int minCount, ref int totalCreated)
+    private SavableData CreateRandomSavableData(int minCount, ref int totalCreated)
     {
 
         Dictionary<DataType, ProbabilityMinMaxCreateCount> dataProbabilities = new Dictionary<DataType, ProbabilityMinMaxCreateCount>
@@ -494,7 +494,7 @@ public class Test : MonoBehaviour
             { DataType.Color, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.Quaternion, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
             { DataType.DateTime, new ProbabilityMinMaxCreateCount(0.5f, 3, 20) },
-            { DataType.SaveableData, new ProbabilityMinMaxCreateCount(0.3f, 1, 2) },
+            { DataType.SavableData, new ProbabilityMinMaxCreateCount(0.3f, 1, 2) },
             { DataType.List_Int, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_Float, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_Long, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
@@ -506,15 +506,15 @@ public class Test : MonoBehaviour
             { DataType.List_Color, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_Quaternion, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_DateTime, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
-            { DataType.List_SaveableData, new ProbabilityMinMaxCreateCount(0.02f, 1, 1) }
+            { DataType.List_SavableData, new ProbabilityMinMaxCreateCount(0.02f, 1, 1) }
         };
 
 
         string fieldName = "f";
 
-        SaveableData root = new SaveableData();
+        SavableData root = new SavableData();
         int currentCount = 0;
-        Queue<SaveableData> frontier = new Queue<SaveableData>();
+        Queue<SavableData> frontier = new Queue<SavableData>();
 
         frontier.Enqueue(root);
 
@@ -522,7 +522,7 @@ public class Test : MonoBehaviour
         while (frontier.Count > 0 && currentCount < minCount)
         {
 
-            SaveableData current = frontier.Dequeue();
+            SavableData current = frontier.Dequeue();
 
             if (totalCreated >= randomTestSize) break;
 
@@ -541,20 +541,20 @@ public class Test : MonoBehaviour
 
                         for (int j = 0; j < randomCount; j++)
                         {
-                            if (dt == DataType.SaveableData)
+                            if (dt == DataType.SavableData)
                             {
-                                SaveableData child = new SaveableData();
+                                SavableData child = new SavableData();
                                 frontier.Enqueue(child);
                                 current.Write(fieldName + currentCount, child);
                                 currentCount++;
                                 totalCreated++;
                             }
-                            else if(dt == DataType.List_SaveableData)
+                            else if(dt == DataType.List_SavableData)
                             {
-                                List<SaveableData> list = new List<SaveableData>();
+                                List<SavableData> list = new List<SavableData>();
                                 for (int k = 0; k < 5; k++)
                                 {
-                                    list.Add(CreateRandomSaveableData(5,ref totalCreated));
+                                    list.Add(CreateRandomSavableData(5,ref totalCreated));
                                 }
                                 current.Write(fieldName+currentCount, list);
                                 currentCount++;
@@ -584,7 +584,7 @@ public class Test : MonoBehaviour
     }
 
 
-    public bool IsSame(SaveableData s0, SaveableData s1)
+    public bool IsSame(SavableData s0, SavableData s1)
     {
 
         if (s0.Fields.Count != s1.Fields.Count)
@@ -630,9 +630,9 @@ public class Test : MonoBehaviour
 
             return bytes0.SequenceEqual(bytes1);
         }
-        else if(d0.Type == DataType.SaveableData)
+        else if(d0.Type == DataType.SavableData)
         {
-            return IsSame(d0.GetValue<SaveableData>(), d1.GetValue<SaveableData>());
+            return IsSame(d0.GetValue<SavableData>(), d1.GetValue<SavableData>());
         }
         else
         {
@@ -641,9 +641,9 @@ public class Test : MonoBehaviour
             if(list0.Count != list1.Count) return false;
             for (int i = 0; i < list0.Count; i++)
             {
-                if (d0.Type == DataType.List_SaveableData)
+                if (d0.Type == DataType.List_SavableData)
                 {
-                    if (!IsSame((SaveableData)list0[i], (SaveableData)list1[i])) return false;
+                    if (!IsSame((SavableData)list0[i], (SavableData)list1[i])) return false;
                 }
                 else
                 {

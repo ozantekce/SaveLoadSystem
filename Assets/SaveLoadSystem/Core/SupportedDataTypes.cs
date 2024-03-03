@@ -20,7 +20,7 @@ namespace SaveLoadSystem.Core
         Quaternion = 9,
         DateTime = 10,
 
-        SaveableData = 11,
+        SavableData = 11,
         //
 
         // Lists
@@ -37,7 +37,7 @@ namespace SaveLoadSystem.Core
         List_Quaternion = 21,
         List_DateTime = 22,
 
-        List_SaveableData = 23,
+        List_SavableData = 23,
         //
 
     }

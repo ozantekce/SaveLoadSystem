@@ -2,41 +2,41 @@ using SaveLoadSystem.Core;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMono : MonoBehaviour, ISaveable
+public class PlayerMono : MonoBehaviour, ISavable
 {
 
     public ComponentMono component;
 
 
 
-    public virtual SaveableData ConvertToSaveableData()
+    public virtual SavableData ConvertToSavableData()
     {
-        SaveableData saveableData = new SaveableData();
+        SavableData savableData = new SavableData();
 
-        saveableData.Write("transform", TransformToSaveableData());
+        savableData.Write("transform", TransformToSavableData());
 
-        List<ISaveable> saveableComponents = new List<ISaveable>(GetComponents<ISaveable>());
+        List<ISavable> savableComponents = new List<ISavable>(GetComponents<ISavable>());
 
-        SaveableData components = new SaveableData();
-        components.Write(nameof(components), saveableComponents);
+        SavableData components = new SavableData();
+        components.Write(nameof(components), savableComponents);
 
-        saveableData.Write("components", components);
+        savableData.Write("components", components);
 
 
 
-        return saveableData;
+        return savableData;
     }
 
-    public virtual void LoadSavedData(SaveableData data)
+    public virtual void LoadSavedData(SavableData data)
     {
         throw new System.NotImplementedException();
     }
 
 
 
-    private SaveableData TransformToSaveableData()
+    private SavableData TransformToSavableData()
     {
-        SaveableData transformData = new SaveableData();
+        SavableData transformData = new SavableData();
 
         transformData.Write("position", transform.localPosition);
         transformData.Write("rotation", transform.localRotation);

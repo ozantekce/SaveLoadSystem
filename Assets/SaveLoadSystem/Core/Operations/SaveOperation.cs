@@ -22,9 +22,9 @@ namespace SaveLoadSystem.Core
 
             Status = OperationStatus.InProgress;
 
-            SaveableData saveableData = ConvertToSaveableData(Data);
+            SavableData savableData = ConvertToSavableData(Data);
             ISaveLoadStrategy strategy = ISaveLoadStrategy.GetInstance(SaveStrategy);
-            strategy.Save(saveableData, Path, FileName, RunAsync, EncryptionType, EncryptionKey);
+            strategy.Save(savableData, Path, FileName, RunAsync, EncryptionType, EncryptionKey);
             
             Callback?.Invoke();
 
@@ -32,9 +32,9 @@ namespace SaveLoadSystem.Core
         }
 
 
-        private SaveableData ConvertToSaveableData(T data)
+        private SavableData ConvertToSavableData(T data)
         {
-            return data is ISaveable saveable ? saveable.ConvertToSaveableData() : data as SaveableData;
+            return data is ISavable savable ? savable.ConvertToSavableData() : data as SavableData;
         }
 
 

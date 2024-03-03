@@ -156,7 +156,7 @@ namespace SaveLoadSystem.Core
                 Color c => new DataWrapper(c.ColorToBytes(), DataType.Color),
                 Quaternion q => new DataWrapper(q.QuaternionToBytes(), DataType.Quaternion),
                 DateTime dt => new DataWrapper(dt.DateTimeToBytes(), DataType.DateTime),
-                SaveableData sd => new DataWrapper(sd, DataType.SaveableData),
+                SavableData sd => new DataWrapper(sd, DataType.SavableData),
                 // List
                 List<int> listInt => new DataWrapper(listInt, DataType.List_Int),
                 List<float> listFloat => new DataWrapper(listFloat, DataType.List_Float),
@@ -169,7 +169,7 @@ namespace SaveLoadSystem.Core
                 List<Color> listColor => new DataWrapper(listColor.ConvertToBytesList(), DataType.List_Color),
                 List<Quaternion> listQuaternion => new DataWrapper(listQuaternion.ConvertToBytesList(), DataType.List_Quaternion),
                 List<DateTime> listDateTime => new DataWrapper(listDateTime.ConvertToBytesList(), DataType.List_DateTime),
-                List<SaveableData> listSaveableData => new DataWrapper(listSaveableData, DataType.List_SaveableData),
+                List<SavableData> listSavableData => new DataWrapper(listSavableData, DataType.List_SavableData),
                 _ => throw new ArgumentException("Unsupported data type", nameof(data)),
             };
         }
