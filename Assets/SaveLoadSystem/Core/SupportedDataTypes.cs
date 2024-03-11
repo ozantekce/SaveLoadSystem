@@ -40,6 +40,8 @@ namespace SaveLoadSystem.Core
         List_SavableData = 23,
         //
 
+        Null = 24,
+
     }
 
 }

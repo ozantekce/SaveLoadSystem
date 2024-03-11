@@ -61,6 +61,8 @@ public static class RandomValueGenerator
                 return RandomValueGenerator.CreateRandomQuaternionList();
             case DataType.List_DateTime:
                 return RandomValueGenerator.CreateRandomDateTimeList();
+            case DataType.Null:
+                return null;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), $"Not expected data type value: {type}");
         }

@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,11 +44,16 @@ namespace SaveLoadSystem.Core
             t = dataType;
         }
 
+        internal DataWrapper()
+        {
+            t = DataType.Null;
+        }
+
 
         public T GetValue<T>()
         {
 
-            if(t == DataType.Vector3)
+            if (t == DataType.Vector3)
             {
                 return (T)(object)SerializableConverter.ConvertToObject<Vector3>((byte[])v);
             }
@@ -142,6 +148,29 @@ namespace SaveLoadSystem.Core
 
         public static DataWrapper Create<T>(T data)
         {
+
+
+            if (data is ISavable savable)
+            {
+                return new DataWrapper(savable.ConvertToSavableData(), DataType.SavableData);
+            }
+
+            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>))
+            {
+                var itemType = typeof(T).GetGenericArguments()[0];
+                if (typeof(ISavable).IsAssignableFrom(itemType))
+                {
+                    var list = data as IList;
+                    var savableDataList = new List<SavableData>();
+                    foreach (var item in list)
+                    {
+                        savableDataList.Add(((ISavable)item).ConvertToSavableData());
+                    }
+                    return new DataWrapper(savableDataList, DataType.List_SavableData);
+                }
+            }
+
+
             return data switch
             {
                 int i => new DataWrapper(i, DataType.Int),
@@ -170,10 +199,12 @@ namespace SaveLoadSystem.Core
                 List<Quaternion> listQuaternion => new DataWrapper(listQuaternion.ConvertToBytesList(), DataType.List_Quaternion),
                 List<DateTime> listDateTime => new DataWrapper(listDateTime.ConvertToBytesList(), DataType.List_DateTime),
                 List<SavableData> listSavableData => new DataWrapper(listSavableData, DataType.List_SavableData),
+                null => new DataWrapper(),
                 _ => throw new ArgumentException("Unsupported data type", nameof(data)),
             };
-        }
 
+
+        }
 
     }
 

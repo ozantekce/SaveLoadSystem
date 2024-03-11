@@ -200,8 +200,13 @@ namespace SaveLoadSystem.Core
 
                     for (int i = 0; i < stringList.Count; i++)
                     {
-                        byte[] strBytes = System.Text.Encoding.UTF8.GetBytes(stringList[i]);
-                        refSerializedData.AddRange(stringList[i].Length.IntToBytes());
+                        string str = stringList[i];
+                        if(str == null)
+                        {
+                            str = string.Empty;
+                        }
+                        byte[] strBytes = System.Text.Encoding.UTF8.GetBytes(str);
+                        refSerializedData.AddRange(str.Length.IntToBytes());
                         refSerializedData.AddRange(strBytes);
                     }
                     return;
@@ -284,6 +289,12 @@ namespace SaveLoadSystem.Core
                         Serialize(savableDataList[i], refSerializedData, runAsync);
                     }
                     return;
+
+                case DataType.Null:
+                    // Add the DataType byte for null.
+                    refSerializedData.Add(data.Type.DataTypeToByte());
+                    return;
+
 
                 default:
                     throw new InvalidOperationException("Unsupported data type." + data+" "+data.GetType());
@@ -452,6 +463,11 @@ namespace SaveLoadSystem.Core
                         }
                         fieldValue = listData;
                         break;
+
+                    case DataType.Null:
+                        fieldValue = null;
+                        break;
+
                     default:
                         throw new InvalidOperationException($"Unsupported data type: {dataType}");
                 }

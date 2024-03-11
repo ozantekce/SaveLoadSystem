@@ -31,13 +31,18 @@ public class Test : MonoBehaviour
 
         saveData.Write("vector2", new Vector2(10, 20));
 
+        saveData.Write<string>("nullTest", null);
+
         List<int> array = new List<int>();
         for (int i = 0; i < 20; i++)
         {
             array.Add(i);
         }
 
+        List<string> strList = new List<string> { "a", "b", null, "c" };
+
         saveData.Write("list", array);
+        saveData.Write("strList", strList);
         SaveLoadManager.Save(saveData, fileName, saveMode);
     }
 
@@ -54,10 +59,20 @@ public class Test : MonoBehaviour
 
         List<int> array = loadedData.Read<List<int>>("list");
 
+        Debug.Log(loadedData.Read<string>("nullTest") == null);
+
         foreach (var item in array)
         {
             Debug.Log("array : " + item);
         }
+
+        List<string> strList = loadedData.Read<List<string>>("strList");
+
+        foreach (var item in strList)
+        {
+            Debug.Log("strList : " + item);
+        }
+
     }
 
 
@@ -506,7 +521,8 @@ public class Test : MonoBehaviour
             { DataType.List_Color, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_Quaternion, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
             { DataType.List_DateTime, new ProbabilityMinMaxCreateCount(0.1f, 1, 5) },
-            { DataType.List_SavableData, new ProbabilityMinMaxCreateCount(0.02f, 1, 1) }
+            { DataType.List_SavableData, new ProbabilityMinMaxCreateCount(0.02f, 1, 1) },
+            { DataType.Null, new ProbabilityMinMaxCreateCount(0.5f, 3, 10) }
         };
 
 
@@ -633,6 +649,10 @@ public class Test : MonoBehaviour
         else if(d0.Type == DataType.SavableData)
         {
             return IsSame(d0.GetValue<SavableData>(), d1.GetValue<SavableData>());
+        }
+        else if(d0.Type == DataType.Null && d1.Type == DataType.Null)
+        {
+            return true;
         }
         else
         {

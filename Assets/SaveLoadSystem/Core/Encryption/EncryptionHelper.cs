@@ -4,7 +4,7 @@ namespace SaveLoadSystem.Core
     internal static class EncryptionHelper
     {
 
-        private static Dictionary<EncryptionType, IEncrypter> Encrypters = new Dictionary<EncryptionType, IEncrypter>()
+        private static readonly Dictionary<EncryptionType, IEncrypter> Encrypters = new Dictionary<EncryptionType, IEncrypter>()
         {
             {EncryptionType.XOR, new XOREncrypter() },
             {EncryptionType.AES, new AESEncrypter() },

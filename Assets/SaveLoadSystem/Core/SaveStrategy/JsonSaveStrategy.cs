@@ -102,6 +102,7 @@ namespace SaveLoadSystem.Core
                     data.ToObject<List<JObject>>(serializer)
                         .Select(jobj => new SavableData(jobj["fields"].ToObject<Dictionary<string, DataWrapper>>(serializer)))
                         .ToList(), DataType.List_SavableData),
+                DataType.Null => new DataWrapper(),
 
                 _ => throw new JsonSerializationException($"Unknown DataType: {dataType}")
             };

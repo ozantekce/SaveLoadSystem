@@ -7,7 +7,7 @@ namespace SaveLoadSystem.Core
     public static class SaveLoadManager
     {
         private const string EncryptionKey = "5ZaX8nC2pY7kF4rO9gE0bL3tU1mQ6sWv";
-        private static OperationsRunner OperationsRunner = new OperationsRunner();
+        private static readonly OperationsRunner OperationsRunner = new OperationsRunner();
         private static Thread MasterThread;
 
         public static void Save<T>(T data, string fileName, SaveMode saveStrategy = SaveMode.CustomSerialize, EncryptionType encryptionType = EncryptionType.None, bool runAsync = false, Action callback = null)
@@ -75,9 +75,11 @@ namespace SaveLoadSystem.Core
 
         private static void ExecuteOperationSynchronously(IOperation operation)
         {
+
+            operation.Start();
             try
             {
-                operation.Start();
+                
             }
             catch (Exception ex)
             {

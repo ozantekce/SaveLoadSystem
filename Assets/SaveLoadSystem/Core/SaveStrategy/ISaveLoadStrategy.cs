@@ -5,7 +5,7 @@ namespace SaveLoadSystem.Core
     internal interface ISaveLoadStrategy
     {
 
-        private static Dictionary<SaveMode, ISaveLoadStrategy> Instances = new Dictionary<SaveMode, ISaveLoadStrategy>()
+        private static readonly Dictionary<SaveMode, ISaveLoadStrategy> Instances = new Dictionary<SaveMode, ISaveLoadStrategy>()
         {
             { SaveMode.CustomSerialize,new CustomSerializeSaveStrategy() },
             { SaveMode.Json, new JsonSaveStrategy() },
