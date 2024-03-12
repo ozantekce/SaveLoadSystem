@@ -21,8 +21,16 @@ namespace SaveLoadSystem.Core
         {
             Status = OperationStatus.InProgress;
 
-            ISaveLoadStrategy strategy = ISaveLoadStrategy.GetInstance(SaveStrategy);
-            Result = strategy.Load(Path, FileName, RunAsync, EncryptionType, EncryptionKey);
+            try
+            {
+                ISaveLoadStrategy strategy = ISaveLoadStrategy.GetInstance(SaveStrategy);
+                Result = strategy.Load(Path, FileName, RunAsync, EncryptionType, EncryptionKey);
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.Log(ex);
+            }
+
             Callback?.Invoke(Result);
 
             if (RunAsync) Result = null; // clear

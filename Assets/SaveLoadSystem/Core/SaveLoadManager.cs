@@ -75,11 +75,9 @@ namespace SaveLoadSystem.Core
 
         private static void ExecuteOperationSynchronously(IOperation operation)
         {
-
-            operation.Start();
             try
             {
-                
+                operation.Start();
             }
             catch (Exception ex)
             {

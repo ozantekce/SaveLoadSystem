@@ -22,9 +22,16 @@ namespace SaveLoadSystem.Core
 
             Status = OperationStatus.InProgress;
 
-            SavableData savableData = ConvertToSavableData(Data);
-            ISaveLoadStrategy strategy = ISaveLoadStrategy.GetInstance(SaveStrategy);
-            strategy.Save(savableData, Path, FileName, RunAsync, EncryptionType, EncryptionKey);
+            try
+            {
+                SavableData savableData = ConvertToSavableData(Data);
+                ISaveLoadStrategy strategy = ISaveLoadStrategy.GetInstance(SaveStrategy);
+                strategy.Save(savableData, Path, FileName, RunAsync, EncryptionType, EncryptionKey);
+            }
+            catch (System.Exception ex)
+            {
+                UnityEngine.Debug.Log(ex);
+            }
             
             Callback?.Invoke();
 
